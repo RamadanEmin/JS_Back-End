@@ -1,21 +1,21 @@
 // [x] initialize and configure Express app
 // [x] initialize templating lib
-// [ ] create home controller
+// [x] create home controller
 // [x] bind routing
 // [x] create layout
 // create data service
-// - [ ] read all
+// - [x] read all
 // - [ ] read one by Id
 // - [ ] create
-// - [ ] search
+// - [x] search
 // - [ ] edit
 // - [ ] delete
 // implement controllers
-// - [ ] home (catalog)
+// - [x] home (catalog)
 // - [ ] about
 // - [ ] details
 // - [ ] create
-// - [ ] improved home (search)
+// - [x] improved home (search)
 // - [ ] edit
 // - [ ] delete
 // [ ] add front-end code
@@ -25,6 +25,7 @@ const hbs = require('express-handlebars');
 
 const carsService = require('./services/cars')
 
+const { home } = require('./controllers/home');
 const { about } = require('./controllers/about');
 
 const { notFound } = require('./controllers/notFound');
@@ -40,6 +41,7 @@ app.use(expresss.urlencoded({ extended: true }));
 app.use('/static', expresss.static('static'));
 app.use(carsService());
 
+app.get('/', home);
 app.get('/about', about);
 
 app.all('*', notFound);
