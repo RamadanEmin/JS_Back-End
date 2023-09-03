@@ -42,6 +42,17 @@ async function getAll(query) {
     return cars;
 };
 
+async function getById(id) {
+    const data = await read();
+    const car = data[id];
+
+    if (car) {
+        return Object.assign({}, { id }, car);
+    } else {
+        return undefined;
+    }
+};
+
 async function createCar(car) {
     const cars = await read();
     let id;
@@ -61,6 +72,7 @@ function nextId() {
 module.exports = () => (req, res, next) => {
     req.storage = {
         getAll,
+        getById,
         createCar,
     };
     next();
