@@ -14,6 +14,16 @@ async function read() {
     }
 };
 
+async function write(data) {
+    try {
+        await fs.writeFile(filePath, JSON.stringify(data, null, 2));
+    } catch (err) {
+        console.log('Database write error');
+        console.log(err);
+        process.exit(1);
+    }
+};
+
 async function getAll(query) {
     const data = await read();
 
@@ -32,9 +42,26 @@ async function getAll(query) {
     return cars;
 };
 
+async function createCar(car) {
+    const cars = await read();
+    let id;
+
+    do {
+        id = nextId();
+    } while (cars.hasOwnProperty(id));
+
+    cars[id] = car;
+    await write(cars);
+}
+
+function nextId() {
+    return 'xxxxxxxx-xxxx'.replace(/x/g, () => (Math.random() * 16 | 0).toString(16));
+}
+
 module.exports = () => (req, res, next) => {
     req.storage = {
         getAll,
+        createCar,
     };
     next();
 };

@@ -5,16 +5,16 @@
 // [x] create layout
 // create data service
 // - [x] read all
-// - [ ] read one by Id
-// - [ ] create
+// - [x] read one by Id
+// - [x] create
 // - [x] search
 // - [ ] edit
 // - [ ] delete
 // implement controllers
 // - [x] home (catalog)
-// - [ ] about
+// - [x] about
 // - [ ] details
-// - [ ] create
+// - [x] create
 // - [x] improved home (search)
 // - [ ] edit
 // - [ ] delete
@@ -27,6 +27,7 @@ const carsService = require('./services/cars')
 
 const { home } = require('./controllers/home');
 const { about } = require('./controllers/about');
+const create = require('./controllers/create');
 
 const { notFound } = require('./controllers/notFound');
 
@@ -43,6 +44,7 @@ app.use(carsService());
 
 app.get('/', home);
 app.get('/about', about);
+app.route('/create').get(create.get).post(create.post);
 
 app.all('*', notFound);
 
