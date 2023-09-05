@@ -9,7 +9,7 @@
 // - [x] create
 // - [x] search
 // - [x] edit
-// - [ ] delete
+// - [x] delete
 // implement controllers
 // - [x] home (catalog)
 // - [x] about
@@ -17,7 +17,7 @@
 // - [x] create
 // - [x] improved home (search)
 // - [x] edit
-// - [ ] delete
+// - [x] delete
 // [ ] add front-end code
 
 const expresss = require('express');
@@ -30,6 +30,7 @@ const { about } = require('./controllers/about');
 const create = require('./controllers/create');
 const { details } = require('./controllers/details');
 const edit = require('./controllers/edit');
+const deleteCar = require('./controllers/delete');
 
 const { notFound } = require('./controllers/notFound');
 
@@ -49,6 +50,7 @@ app.get('/about', about);
 app.get('/details/:id', details);
 app.route('/create').get(create.get).post(create.post);
 app.route('/edit/:id').get(edit.get).post(edit.post);
+app.route('/delete/:id').get(deleteCar.get).post(deleteCar.post);
 
 app.all('*', notFound);
 
