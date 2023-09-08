@@ -10,6 +10,9 @@
 // - [x] search
 // - [x] edit
 // - [x] delete
+// - [ ] accessory read
+// - [ ] accessory create
+// - [ ] attach accessory
 // implement controllers
 // - [x] home (catalog)
 // - [x] about
@@ -18,7 +21,15 @@
 // - [x] improved home (search)
 // - [x] edit
 // - [x] delete
+// - [ ] create accessory
+// - [ ] attach accessory to car
+// - [ ] update details to include accessory
 // [x] add front-end code
+// [x] add database connection
+// [ ] create Car model
+// [ ] upgrade car service to use Car model
+// [ ] add validation rules to Car model
+// [ ] create Accessory model
 
 const expresss = require('express');
 const hbs = require('express-handlebars');
@@ -34,25 +45,31 @@ const deleteCar = require('./controllers/delete');
 
 const { notFound } = require('./controllers/notFound');
 
-const app = expresss();
+main();
 
-app.engine('.hbs', hbs.create({
-    extname: '.hbs'
-}).engine);
-app.set('view engine', '.hbs');
+async function main() {
+    await initDb();
 
-app.use(expresss.urlencoded({ extended: true }));
-app.use('/static', expresss.static('static'));
-app.use(carsService());
+    const app = expresss();
 
-app.get('/', home);
-app.get('/about', about);
-app.get('/details/:id', details);
-app.route('/create').get(create.get).post(create.post);
-app.route('/edit/:id').get(edit.get).post(edit.post);
-app.route('/delete/:id').get(deleteCar.get).post(deleteCar.post);
+    app.engine('.hbs', hbs.create({
+        extname: '.hbs'
+    }).engine);
+    app.set('view engine', '.hbs');
 
-app.all('*', notFound);
+    app.use(expresss.urlencoded({ extended: true }));
+    app.use('/static', expresss.static('static'));
+    app.use(carsService());
+
+    app.get('/', home);
+    app.get('/about', about);
+    app.get('/details/:id', details);
+    app.route('/create').get(create.get).post(create.post);
+    app.route('/edit/:id').get(edit.get).post(edit.post);
+    app.route('/delete/:id').get(deleteCar.get).post(deleteCar.post);
+
+    app.all('*', notFound);
 
 
-app.listen(3000, () => console.log('Server started on port 3000'));
+    app.listen(3000, () => console.log('Server started on port 3000'));
+}
