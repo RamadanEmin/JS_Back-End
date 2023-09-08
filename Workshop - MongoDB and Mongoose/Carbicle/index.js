@@ -28,8 +28,8 @@
 // [x] add database connection
 // [x] create Car model
 // [x] upgrade car service to use Car model
-// [ ] add validation rules to Car model
-// [ ] create Accessory model
+// [X] add validation rules to Car model
+// [x] create Accessory model
 
 const expresss = require('express');
 const hbs = require('express-handlebars');
