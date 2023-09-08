@@ -18,11 +18,6 @@ const carSchema = new Schema({
         type: Number,
         required: true,
         min: 0
-    },
-    accessories: {
-        type: [ObjectId],
-        default: [],
-        ref: 'Accessory'
     }
 });
 
