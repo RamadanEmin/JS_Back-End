@@ -12,7 +12,7 @@
 // - [x] delete
 // - [x] accessory read
 // - [x] accessory create
-// - [ ] attach accessory
+// - [x] attach accessory
 // implement controllers
 // - [x] home (catalog)
 // - [x] about
@@ -28,11 +28,13 @@
 // [x] add database connection
 // [x] create Car model
 // [x] upgrade car service to use Car model
-// [X] add validation rules to Car model
+// [x] add validation rules to Car model
 // [x] create Accessory model
 
 const expresss = require('express');
 const hbs = require('express-handlebars');
+
+const initDb = require('./models/index');
 
 const carsService = require('./services/cars')
 
@@ -42,6 +44,8 @@ const create = require('./controllers/create');
 const { details } = require('./controllers/details');
 const edit = require('./controllers/edit');
 const deleteCar = require('./controllers/delete');
+const accessory = require('./controllers/accessory');
+const attach = require('./controllers/attach');
 
 const { notFound } = require('./controllers/notFound');
 
@@ -67,9 +71,10 @@ async function main() {
     app.route('/create').get(create.get).post(create.post);
     app.route('/edit/:id').get(edit.get).post(edit.post);
     app.route('/delete/:id').get(deleteCar.get).post(deleteCar.post);
+    app.route('/accessory').get(accessory.get).post(accessory.post);
+    app.route('/attach/:id').get(attach.get).post(attach.post);
 
     app.all('*', notFound);
-
 
     app.listen(3000, () => console.log('Server started on port 3000'));
 }
