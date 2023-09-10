@@ -22,8 +22,8 @@
 // - [x] edit
 // - [x] delete
 // - [x] create accessory
-// - [ ] attach accessory to car
-// - [ ] update details to include accessory
+// - [x] attach accessory to car
+// - [x] update details to include accessory
 // [x] add front-end code
 // [x] add database connection
 // [x] create Car model
@@ -37,6 +37,7 @@ const hbs = require('express-handlebars');
 const initDb = require('./models/index');
 
 const carsService = require('./services/cars')
+const accessoryService = require('./services/accessory')
 
 const { home } = require('./controllers/home');
 const { about } = require('./controllers/about');
@@ -64,6 +65,7 @@ async function main() {
     app.use(expresss.urlencoded({ extended: true }));
     app.use('/static', expresss.static('static'));
     app.use(carsService());
+    app.use(accessoryService());
 
     app.get('/', home);
     app.get('/about', about);
