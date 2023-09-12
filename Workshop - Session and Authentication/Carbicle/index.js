@@ -41,7 +41,7 @@
 // [ ] add validation rules to Car model
 // [ ] create Accessory model
 // [ ] add session middleware and auth libraries
-// [ ] create User model
+// [x] create User model
 // [ ] add owner property to Car, Accessory models
 
 const expresss = require('express');
