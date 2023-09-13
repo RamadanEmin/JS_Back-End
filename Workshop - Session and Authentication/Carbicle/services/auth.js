@@ -1,0 +1,22 @@
+const User = require('../models/User');
+
+async function register(session, username, password) {
+    const user = new User({
+        username,
+        hashedPassword: password
+    });
+    await user.save();
+
+    session.user = {
+        id: user._id,
+        username: user.username
+    };
+}
+
+module.exports = () => (req, res, next) => {
+    req.auth = {
+        register,
+    };
+
+    next();
+};
