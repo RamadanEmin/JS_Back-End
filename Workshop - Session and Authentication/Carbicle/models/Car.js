@@ -23,6 +23,14 @@ const carSchema = new Schema({
         type: [ObjectId],
         default: [],
         ref: 'Accessory'
+    },
+    isDeleted: {
+        type: Boolean,
+        default: false
+    },
+    owner: {
+        type: ObjectId,
+        ref: 'User'
     }
 });
 

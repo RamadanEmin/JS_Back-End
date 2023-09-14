@@ -1,4 +1,4 @@
-const { Schema, model } = require('mongoose');
+const { Schema, model, Types: { ObjectId } } = require('mongoose');
 
 const accessorySchema = new Schema({
     name: {
@@ -17,6 +17,10 @@ const accessorySchema = new Schema({
         type: Number,
         min: 0
     },
+    owner: {
+        type: ObjectId,
+        ref: 'User'
+    }
 });
 
 const Accessory = model('Accessory', accessorySchema);
