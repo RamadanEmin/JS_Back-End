@@ -13,9 +13,21 @@ async function register(session, username, password) {
     };
 }
 
+async function login(session, username, password) {
+    const user = await User.findOne({ username });
+
+    if (user && await user.comparePassword(password)) {
+
+        return true;
+    } else {
+        throw new Error('Incorrect username or password');
+    }
+}
+
 module.exports = () => (req, res, next) => {
     req.auth = {
         register,
+        login
     };
 
     next();
