@@ -30,4 +30,8 @@ module.exports = {
             res.redirect('/login');
         }
     },
+    logoutGet(req, res) {
+        req.auth.logout();
+        res.redirect('/');
+    },
 };
