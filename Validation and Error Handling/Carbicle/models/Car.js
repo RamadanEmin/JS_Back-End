@@ -3,8 +3,7 @@ const { Schema, model, Types: { ObjectId } } = require('mongoose');
 const carSchema = new Schema({
     name: {
         type: String,
-        required: true,
-        minlength: 3
+        minlength: [3, 'Car listing name must be at least 3 characters long!']
     },
     description: {
         type: String,
@@ -12,7 +11,8 @@ const carSchema = new Schema({
     },
     imageUrl: {
         type: String,
-        default: 'noImage.jpg'
+        default: 'noImage.jpg',
+        match:[/^https?:\/\//,'Image URL must be a valid URL!']
     },
     price: {
         type: Number,

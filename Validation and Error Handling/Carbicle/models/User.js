@@ -5,8 +5,7 @@ const userSchema = new Schema({
     username: {
         type: String,
         required: true,
-        minlength: 3,
-        unique: true
+        minlength: 3
     },
     hashedPassword: {
         type: String,
@@ -14,7 +13,16 @@ const userSchema = new Schema({
     }
 });
 
+userSchema.index({ username: 1 }, {
+    unique: true,
+    collation: {
+        locale: 'en',
+        strength: 2
+    }
+});
+
 userSchema.methods.comparePassword = async function (password) {
+    // Use bcrypt to hash and compare incoming password with stores hashed password
 
     return await comparePassword(password, this.hashedPassword);
 };
@@ -23,7 +31,7 @@ userSchema.pre('save', async function (next) {
     if (this.isModified('hashedPassword')) {
         this.hashedPassword = await hashPassword(this.hashedPassword);
     }
-    
+
     next();
 });
 
