@@ -47,8 +47,8 @@ const session = require('express-session');
 
 const initDb = require('./models/index');
 
-const carsService = require('./services/cars');
-const accessoryService = require('./services/accessory');
+const carsService = require('./services/cars')
+const accessoryService = require('./services/accessory')
 const authService = require('./services/auth');
 
 const { home } = require('./controllers/home');
@@ -59,7 +59,7 @@ const edit = require('./controllers/edit');
 const deleteCar = require('./controllers/delete');
 const accessory = require('./controllers/accessory');
 const attach = require('./controllers/attach');
-const { registerGet, registerPost, loginGet, loginPost, logoutGet } = require('./controllers/auth');
+const authController = require('./controllers/auth');
 
 const { notFound } = require('./controllers/notFound');
 const { isLoggedIn } = require('./services/util');
@@ -114,15 +114,7 @@ async function main() {
         .get(isLoggedIn(), attach.get)
         .post(isLoggedIn(), attach.post);
 
-    app.route('/register')
-        .get(registerGet)
-        .post(registerPost);
-
-    app.route('/login')
-        .get(loginGet)
-        .post(loginPost);
-
-    app.get('/logout', isLoggedIn(), logoutGet);
+    app.use(authController);
 
     app.all('*', notFound);
 
