@@ -1,6 +1,31 @@
 const { body, validationResult } = require('express-validator');
-const { register } = require('../services/authService');
+const { login, register } = require('../services/authService');
+const { parseError } = require('../utils/parser');
 const authController = require('express').Router();
+
+authController.get('/login', (req, res) => {
+    res.render('login', {
+        title: 'Login'
+    });
+});
+
+authController.post('/login',
+    body(['username', 'password']).trim(),
+    async(req, res) => {
+        try {
+            const result = await login(req.body.username, req.body.password);
+            attachToken(req, res, result);
+            res.redirect('/');
+        } catch (error) {
+            res.render('login', {
+                title: 'Login',
+                body: {
+                    username: req.body.username
+                },
+                error: parseError(error)
+            })
+        }
+    });
 
 authController.get('/register', (req, res) => {
     res.render('register', {
@@ -41,10 +66,16 @@ authController.post('/register',
                 title: 'Register',
                 body: {
                     username: req.body.username
-                }
+                },
+                error: parseError(error)
             });
         }
     });
+
+authController.get('/logout', (req, res) => {
+    res.clearCookie('jwt');
+    return res.redirect('/');
+});
 
 function attachToken(req, res, data) {
     const token = req.signJwt(data);
