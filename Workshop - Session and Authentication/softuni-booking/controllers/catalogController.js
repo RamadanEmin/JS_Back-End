@@ -1,4 +1,4 @@
-const { getAll } = require('../services/roomService');
+const { getAll, getById } = require('../services/roomService');
 
 const router = require('express').Router();
 
@@ -22,6 +22,27 @@ router.get('/', async(req, res) => {
         fromPrice,
         toPrice
     })
+})
+
+router.get('/:id', async(req, res) => {
+    const roomId = req.params.id;
+    const room = await getById(roomId);
+
+    if (req.user && req.user._id == room.owner) {
+        room.isOwner = true;
+    }
+
+    if (room) {
+        res.render('details', {
+            title: 'Accomodation Details',
+            room
+        })
+    } else {
+        res.render('roomNotFound', {
+            title: 'Accomodation Details',
+            roomId
+        })
+    }
 })
 
 module.exports = router;
