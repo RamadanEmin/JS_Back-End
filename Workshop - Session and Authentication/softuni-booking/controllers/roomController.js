@@ -1,4 +1,4 @@
-const { getById, update } = require('../services/roomService');
+const { getById, update, deleteById } = require('../services/roomService');
 const { parseError } = require('../utils/parser');
 
 const roomController = require('express').Router();
@@ -40,5 +40,43 @@ roomController.post('/:id/edit', async(req, res) => {
         });
     }
 });
+
+roomController.get('/:id/delete', async(req, res) => {
+    const roomId = req.params.id;
+    const room = await getById(roomId);
+
+    if (!req.user || room.owner != req.user._id) {
+        return res.redirect('/auth/login');
+    }
+
+    res.render('delete', {
+        title: 'Delete Accomodation',
+        room
+    });
+});
+
+roomController.post('/:id/delete', async(req, res) => {
+    const roomId = req.params.id;
+    const room = await getById(roomId);
+
+    if (!req.user || room.owner != req.user._id) {
+        return res.redirect('/auth/login');
+    }
+
+    try {
+        await deleteById(roomId);
+
+        res.redirect('/catalog');
+
+    } catch (err) {
+        req.body._id = roomId;
+        res.render('delete', {
+            title: 'Delete Accomodation',
+            error: err.message.split('\n'),
+            room: req.body
+        });
+    }
+});
+
 
 module.exports = roomController;

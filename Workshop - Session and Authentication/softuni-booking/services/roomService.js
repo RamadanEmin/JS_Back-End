@@ -49,9 +49,14 @@ async function update(roomId, roomData) {
     return room;
 }
 
+async function deleteById(roomId) {
+    return Room.findByIdAndRemove(roomId);
+}
+
 module.exports = {
     getAll,
     getById,
     create,
-    update
+    update,
+    deleteById
 };
