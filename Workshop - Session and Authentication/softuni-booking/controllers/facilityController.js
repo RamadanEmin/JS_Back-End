@@ -1,5 +1,6 @@
 const { hasRole } = require('../middlewares/guards');
-const { createFacility } = require('../services/facilityService');
+const { createFacility, getAllFacilities } = require('../services/facilityService');
+const { getById } = require('../services/roomService');
 
 const facilityController = require('express').Router();
 const { body, validationResult } = require('express-validator');
@@ -35,5 +36,27 @@ facilityController.post('/create', hasRole('admin'),
             });
         }
     });
+
+facilityController.get('/:roomId/decorateRoom', async(req, res) => {
+    const roomId = req.params.roomId;
+    const room = await getById(roomId);
+
+    if (!req.user || req.user._id != room.owner) {
+        return res.redirect('/auth/login');
+    }
+
+    const facilities = await getAllFacilities();
+    facilities.forEach(f => {
+        if ((room.facilities || []).some(facility => facility._id.toString() == f._id.toString())) {
+            f.checked = true;
+        }
+    })
+
+    res.render('decorate', {
+        title: 'Add Facility',
+        room,
+        facilities
+    })
+});
 
 module.exports = facilityController;
