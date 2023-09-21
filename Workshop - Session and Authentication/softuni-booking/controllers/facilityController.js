@@ -1,5 +1,5 @@
 const { hasRole } = require('../middlewares/guards');
-const { createFacility, getAllFacilities } = require('../services/facilityService');
+const { createFacility, getAllFacilities, addFacilities } = require('../services/facilityService');
 const { getById } = require('../services/roomService');
 
 const facilityController = require('express').Router();
@@ -57,6 +57,11 @@ facilityController.get('/:roomId/decorateRoom', async(req, res) => {
         room,
         facilities
     })
+});
+
+facilityController.post('/:roomId/decorateRoom', async(req, res) => {
+    await addFacilities(req.params.roomId, Object.keys(req.body));
+    res.redirect('/facility/' + req.params.roomId + '/decorateRoom');
 });
 
 module.exports = facilityController;
