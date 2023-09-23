@@ -25,6 +25,41 @@ async function register(email, password) {
     return createSession(user);
 }
 
+async function login(email, password) {
+    const user = await User.findOne({ email: new RegExp(`^${email}$`, 'i') });
+
+    if (!user) {
+        throw new Error('Incorrect email or password');
+    }
+
+    const match = await bcrypt.compare(password, user.hashedPassword);
+
+    if (!match) {
+        throw new Error('Incorrect email or password');
+    }
+
+    return createSession(user);
+}
+
+function logout(token) {
+    blacklist.add(token);
+}
+
+function createSession(user) {
+    const payload = {
+        email: user.email,
+        _id: user._id
+    };
+
+    const accessToken = jwt.sign(payload, JWT_SECRET);
+
+    return {
+        email: user.email,
+        accessToken,
+        _id: user._id
+    };
+}
+
 function validateToken(token) {
     if (blacklist.has(token)) {
         throw new Error('Token is blacklisted');
@@ -34,5 +69,7 @@ function validateToken(token) {
 
 module.exports = {
     register,
+    login,
+    logout,
     validateToken
 };
