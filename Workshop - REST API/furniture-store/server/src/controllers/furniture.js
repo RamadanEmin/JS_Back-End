@@ -1,6 +1,6 @@
 const router = require('express').Router();
 
-const { isAuth } = require('../middlewares/guards');
+const { isAuth, isOwner } = require('../middlewares/guards');
 const preload = require('../middlewares/preload');
 const api = require('../services/furniture');
 const errorMapper = require('../util/errorMapper');
@@ -39,5 +39,27 @@ router.post('/', isAuth(), async (req, res) => {
 router.get('/:id', preload(api), (req, res) => {
     res.json(res.locals.item);
 });
+
+router.put('/:id', preload(api), isOwner(), async (req, res) => {
+    try {
+        const result = await api.updateById(res.locals.item, req.body);
+        res.json(result);
+    } catch (err) {
+        console.error(err);
+        res.status(400).json({ message: 'Request error' });
+    }
+});
+
+router.delete('/:id', isAuth(), preload(api), isOwner(), async (req, res) => {
+    const id = req.params.id;
+    try {
+        const result = await api.deleteById(id);
+        res.json(result);
+    } catch (err) {
+        console.error(err);
+        res.status(404).json({ message: `Item ${id} not found` });
+    }
+});
+
 
 module.exports = router;
