@@ -1,7 +1,8 @@
 const playController = require('express').Router();
 
+const { isOwner } = require('../middlewares/guards');
 const preload = require('../middlewares/preload');
-const { createPlay } = require('../services/playService');
+const { createPlay, updatePlay } = require('../services/playService');
 const { parseError } = require('../util/parser');
 
 playController.get('/create', (req, res) => {
@@ -36,6 +37,27 @@ playController.post('/create', async (req, res) => {
             title: 'Create Page',
             errors,
             play
+        });
+    }
+});
+
+playController.get('/:id/edit', preload(true), isOwner(), (req, res) => {
+    res.render('edit', { title: 'Edit Page', play: res.locals.play })
+});
+
+
+playController.post('/:id/edit', preload(), isOwner(), async (req, res) => {
+    const play = res.locals.play;
+
+    try {
+        await updatePlay(play, req.body);
+        res.redirect(`/play/${req.params.id}`);
+    } catch (error) {
+        req.body._id = req.params.id;
+        res.render('edit', {
+            title: 'Edit Page',
+            errors: parseError(error),
+            play: req.body
         });
     }
 });
