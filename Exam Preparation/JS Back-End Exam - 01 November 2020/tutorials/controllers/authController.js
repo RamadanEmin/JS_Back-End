@@ -2,7 +2,7 @@ const authController = require('express').Router();
 const { body, validationResult } = require('express-validator');
 
 const { isGuest } = require('../middlewares/guards');
-const { register } = require('../services/userService');
+const { register, login } = require('../services/userService');
 const { parseError } = require('../util/parser');
 
 authController.get('/register', isGuest(), (req, res) => {
@@ -44,5 +44,31 @@ authController.post('/register',
             });
         }
     });
+
+authController.get('/login',isGuest(), (req, res) => {
+    res.render('login', { title: 'Login Page', });
+});
+
+authController.post('/login',isGuest(), async (req, res) => {
+  try {
+    const token = await login(req.body.username, req.body.password);
+    res.cookie('token', token);
+    res.redirect('/');
+  } catch (error) {
+    const errors = parseError(error);
+    res.render('login', {
+      title: 'Login Page',
+      errors,
+      body: {
+        username: req.body.username,
+      },
+    });
+  }
+});
+
+authController.get('/logout', (req, res) => {
+  res.clearCookie('token');
+  res.redirect('/');
+});
 
 module.exports = authController;
