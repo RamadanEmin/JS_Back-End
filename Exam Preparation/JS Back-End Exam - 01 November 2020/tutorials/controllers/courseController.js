@@ -1,4 +1,5 @@
-const { createCourse} = require('../services/courseService');
+const preload = require('../middlewares/preload');
+const { createCourse } = require('../services/courseService');
 const { parseError } = require('../util/parser');
 
 const courseController = require('express').Router();
@@ -28,6 +29,15 @@ courseController.post('/create', async (req, res) => {
             body: course,
         });
     }
+});
+
+courseController.get('/:id', preload(true), async (req, res) => {
+    const course = res.locals.course;
+
+    course.isOwner = course.owner.toString() === req.user._id.toString();
+    course.enrolled = course.users.map(u => u.toString()).includes(req.user._id.toString());
+
+    res.render('details', { title: course.title, course });
 });
 
 module.exports = courseController;
