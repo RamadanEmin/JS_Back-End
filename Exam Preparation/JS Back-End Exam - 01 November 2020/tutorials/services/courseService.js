@@ -17,13 +17,28 @@ async function getById(id) {
     return Course.findById(id).lean();
 }
 
+async function getByIdRaw(id) {
+    return Course.findById(id);
+}
+
 async function createCourse(course) {
     return Course.create(course);
+}
+
+async function updateById(course, data) {
+    course.title = data.title;
+    course.description = data.description;
+    course.imageUrl = data.imageUrl;
+    course.duration = data.duration;
+
+    return course.save();
 }
 
 module.exports = {
     getAllByDate,
     getRecent,
     getById,
+    getByIdRaw,
     createCourse,
+    updateById,
 };

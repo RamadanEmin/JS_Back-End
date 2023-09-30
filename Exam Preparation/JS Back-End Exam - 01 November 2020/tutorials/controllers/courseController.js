@@ -1,5 +1,6 @@
+const { isOwner } = require('../middlewares/guards');
 const preload = require('../middlewares/preload');
-const { createCourse } = require('../services/courseService');
+const { createCourse, updateById } = require('../services/courseService');
 const { parseError } = require('../util/parser');
 
 const courseController = require('express').Router();
@@ -38,6 +39,23 @@ courseController.get('/:id', preload(true), async (req, res) => {
     course.enrolled = course.users.map(u => u.toString()).includes(req.user._id.toString());
 
     res.render('details', { title: course.title, course });
+});
+
+courseController.post('/:id/edit', preload(), isOwner(), async (req, res) => {
+    const course = res.locals.course;
+
+    try {
+        await updateById(course, req.body);
+        res.redirect(`/course/${req.params.id}`);
+    } catch (error) {
+        console.log(error);
+        const errors = parseError(error);
+        res.render('edit', {
+            title: 'Edit Course',
+            errors,
+            course: req.body,
+        });
+    }
 });
 
 module.exports = courseController;
