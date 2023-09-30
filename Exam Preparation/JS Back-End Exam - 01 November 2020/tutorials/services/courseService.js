@@ -13,7 +13,12 @@ async function getRecent() {
     return Course.find({}).sort({ userCount: -1 }).limit(3).lean();
 }
 
+async function createCourse(course) {
+    return Course.create(course);
+}
+
 module.exports = {
     getAllByDate,
     getRecent,
+    createCourse,
 };
