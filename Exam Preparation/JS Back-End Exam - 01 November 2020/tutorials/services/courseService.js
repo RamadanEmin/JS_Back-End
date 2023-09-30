@@ -25,11 +25,22 @@ async function createCourse(course) {
     return Course.create(course);
 }
 
+async function deleteById(id) {
+    return Course.findByIdAndDelete(id);
+}
+
 async function updateById(course, data) {
     course.title = data.title;
     course.description = data.description;
     course.imageUrl = data.imageUrl;
     course.duration = data.duration;
+
+    return course.save();
+}
+
+async function enrollUser(course, userId) {
+    course.users.push(userId);
+    course.userCount++;
 
     return course.save();
 }
@@ -40,5 +51,7 @@ module.exports = {
     getById,
     getByIdRaw,
     createCourse,
+    deleteById,
     updateById,
+    enrollUser
 };
