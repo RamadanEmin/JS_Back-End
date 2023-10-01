@@ -1,6 +1,6 @@
 const hotelController = require('express').Router();
 
-const { create } = require('../services/hotelService');
+const { create, getById } = require('../services/hotelService');
 const { parseError } = require('../util/parser');
 
 hotelController.get('/create', (req, res) => {
@@ -31,6 +31,18 @@ hotelController.post('/create', async (req, res) => {
             errors: parseError(error)
         });
     }
+});
+
+hotelController.get('/:id/details', async (req, res) => {
+    const hotel = await getById(req.params.id);
+
+    if (hotel.owner == req.user._id) {
+        hotel.isOwner = true;
+    } else if (hotel.bookings.map(b => b.toString()).includes(req.user._id.toString())) {
+        hotel.isBooked = true;
+    }
+
+    res.render('details', { title: 'Hotel Details', hotel });
 });
 
 module.exports = hotelController;
