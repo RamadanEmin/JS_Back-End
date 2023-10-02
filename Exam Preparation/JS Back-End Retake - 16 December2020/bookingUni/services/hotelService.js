@@ -23,9 +23,22 @@ async function update(hotelId, hotel) {
     await existing.save();
 }
 
+async function deleteById(hotelId) {
+    await Hotel.findByIdAndDelete(hotelId);
+}
+
+async function bookRoom(hotelId, userId) {
+    const hotel = await Hotel.findById(hotelId);
+
+    hotel.bookings.push(userId);
+    await hotel.save();
+}
+
 module.exports = {
     getAll,
     getById,
     create,
     update,
+    deleteById,
+    bookRoom
 };
