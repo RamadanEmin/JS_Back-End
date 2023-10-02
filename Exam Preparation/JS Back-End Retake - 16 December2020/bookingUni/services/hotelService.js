@@ -12,8 +12,20 @@ async function create(hotel) {
     return Hotel.create(hotel);
 }
 
+async function update(hotelId, hotel) {
+    const existing = await Hotel.findById(hotelId);
+
+    existing.name = hotel.name;
+    existing.city = hotel.city;
+    existing.imageUrl = hotel.imageUrl;
+    existing.rooms = hotel.rooms;
+
+    await existing.save();
+}
+
 module.exports = {
     getAll,
     getById,
     create,
+    update,
 };

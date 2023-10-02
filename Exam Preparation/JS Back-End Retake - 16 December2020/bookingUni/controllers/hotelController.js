@@ -1,6 +1,6 @@
 const hotelController = require('express').Router();
 
-const { create, getById } = require('../services/hotelService');
+const { create, getById, update } = require('../services/hotelService');
 const { parseError } = require('../util/parser');
 
 hotelController.get('/create', (req, res) => {
@@ -43,6 +43,48 @@ hotelController.get('/:id/details', async (req, res) => {
     }
 
     res.render('details', { title: 'Hotel Details', hotel });
+});
+
+hotelController.get('/:id/edit', async (req, res) => {
+    const hotel = await getById(req.params.id);
+
+    if (hotel.owner != req.user._id) {
+        res.redirect('/auth/login');
+    }
+
+    res.render('edit', { title: 'Edit Hotel', hotel });
+});
+
+hotelController.post('/:id/edit', async (req, res) => {
+    const hotelId = req.params.id;
+    const hotel = await getById(hotelId);
+
+    if (hotel.owner != req.user._id) {
+        res.redirect('/auth/login');
+    }
+
+    const edited = {
+        name: req.body.name,
+        city: req.body.city,
+        imageUrl: req.body.imageUrl,
+        rooms: Number(req.body.rooms)
+    };
+
+    try {
+        if (Object.values(edited).some(v => !v)) {
+            throw new Error('All fields are required');
+        }
+
+        await update(hotelId, edited);
+        res.redirect(`/hotel/${hotelId}/details`);
+    } catch (error) {
+        console.error(error);
+        res.render('edit', {
+            title: 'Edit Hotel',
+            hotel: Object.assign(edited, { _id: hotelId }),
+            errors: parseError(error)
+        });
+    }
 });
 
 module.exports = hotelController;
