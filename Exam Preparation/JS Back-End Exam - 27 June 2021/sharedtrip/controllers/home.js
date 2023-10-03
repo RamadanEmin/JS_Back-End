@@ -1,5 +1,6 @@
+const { isUser } = require('../middleware/guards');
 const preload = require('../middleware/preload');
-const { getAllTrips } = require('../services/trip');
+const { getAllTrips, getTripsByUser } = require('../services/trip');
 
 const router = require('express').Router();
 
@@ -26,6 +27,13 @@ router.get('/trips/:id', preload(true), async (req, res) => {
     }
 
     res.render('details', { title: 'Trip Details' });
+});
+
+router.get('/profile', isUser(), async (req, res) => {
+    const tripsByUser = await getTripsByUser(res.locals.user._id);
+    res.locals.user.tripCount = tripsByUser.length;
+    res.locals.user.trips = tripsByUser;
+    res.render('profile', { title: 'Profile page' });
 });
 
 module.exports = router;
