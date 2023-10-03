@@ -17,9 +17,26 @@ async function createTrip(trip) {
     await result.save();
 }
 
+async function updateTrip(id, trip) {
+    const existing = await Trip.findById(id);
+
+    existing.start = trip.start;
+    existing.end = trip.end;
+    existing.date = trip.date;
+    existing.time = trip.time;
+    existing.carImg = trip.carImg;
+    existing.carBrand = trip.carBrand;
+    existing.seats = trip.seats;
+    existing.price = trip.price;
+    existing.description = trip.description;
+
+    await existing.save();
+}
+
 module.exports = {
     getAllTrips,
     getTripById,
     createTrip,
     getTripAndUsers,
+    updateTrip,
 };
