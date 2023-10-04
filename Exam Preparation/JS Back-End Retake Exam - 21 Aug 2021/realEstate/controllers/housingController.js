@@ -1,5 +1,5 @@
 const { hasUser } = require("../middlewares/guards");
-const { createOffer, getById } = require("../services/housingService");
+const { createOffer, getById, updateById } = require("../services/housingService");
 const { parseError } = require("../util/parser");
 
 const housingController = require("express").Router();
@@ -44,6 +44,35 @@ housingController.get('/:id', async (req, res) => {
     }
 
     res.render('details', { title: housing.name, housing });
+});
+
+housingController.get('/:id/edit', hasUser(), async (req, res) => {
+    const housing = await getById(req.params.id);
+
+    if (housing.owner.toString() !== req.user._id.toString()) {
+        res.redirect('/auth/login');
+    }
+
+    res.render('edit', { title: 'Edit', housing });
+});
+
+housingController.post('/:id/edit', hasUser(), async (req, res) => {
+    const housing = await getById(req.params.id);
+
+    if (housing.owner.toString() !== req.user._id.toString()) {
+        res.redirect('/auth/login');
+    }
+
+    try {
+        await updateById(req.params.id, req.body);
+        res.redirect(`/housing/${req.params.id}`);
+    } catch (error) {
+        res.render('create', {
+            title: 'Edit',
+            errors: parseError(error),
+            housing: req.body
+        });
+    }
 });
 
 module.exports = housingController;

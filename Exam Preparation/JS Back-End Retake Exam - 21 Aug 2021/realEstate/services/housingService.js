@@ -22,9 +22,24 @@ async function getById(id) {
     return Housing.findById(id).populate('rented', 'fullName').lean();
 }
 
+async function updateById(id, data) {
+    const existing = await Housing.findById(id);
+
+    existing.name = data.name;
+    existing.year = data.year;
+    existing.type = data.type;
+    existing.city = data.city;
+    existing.image = data.image;
+    existing.propertyDescription = data.propertyDescription;
+    existing.availablePieces = data.availablePieces;
+
+    return existing.save();
+}
+
 module.exports = {
     getRecent,
     getAll,
     createOffer,
     getById,
+    updateById,
 };
