@@ -14,7 +14,12 @@ async function getAll(search) {
     return Housing.find(query).lean();
 }
 
+async function createOffer(offer) {
+    return Housing.create(offer);
+}
+
 module.exports = {
     getRecent,
     getAll,
+    createOffer,
 };
