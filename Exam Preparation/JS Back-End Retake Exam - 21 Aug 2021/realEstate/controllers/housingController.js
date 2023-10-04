@@ -1,5 +1,5 @@
 const { hasUser } = require("../middlewares/guards");
-const { createOffer, getById, updateById, deleteById, rentHousing } = require("../services/housingService");
+const { createOffer, getById } = require("../services/housingService");
 const { parseError } = require("../util/parser");
 
 const housingController = require("express").Router();
@@ -32,6 +32,18 @@ housingController.post('/create', hasUser(), async (req, res) => {
             body: offer
         });
     }
+});
+
+housingController.get('/:id', async (req, res) => {
+    const housing = await getById(req.params.id);
+
+    if (req.user) {
+        housing.isOwner = housing.owner.toString() === req.user._id.toString();
+        housing.isRented = housing.rented.map(r => r.fullName).includes(req.user.fullName.toString());
+        housing.rentedStr = housing.rented.map(r => r.fullName).join(', ');
+    }
+
+    res.render('details', { title: housing.name, housing });
 });
 
 module.exports = housingController;

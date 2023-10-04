@@ -18,8 +18,13 @@ async function createOffer(offer) {
     return Housing.create(offer);
 }
 
+async function getById(id) {
+    return Housing.findById(id).populate('rented', 'fullName').lean();
+}
+
 module.exports = {
     getRecent,
     getAll,
     createOffer,
+    getById,
 };
