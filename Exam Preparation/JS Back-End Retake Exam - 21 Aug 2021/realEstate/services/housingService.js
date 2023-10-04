@@ -36,10 +36,23 @@ async function updateById(id, data) {
     return existing.save();
 }
 
+async function deleteById(id) {
+    return Housing.findByIdAndDelete(id);
+}
+
+async function rentHousing(housingId, userId) {
+    const existing = await Housing.findById(housingId);
+    existing.rented.push(userId);
+    existing.availablePieces--;
+    return existing.save();
+}
+
 module.exports = {
     getRecent,
     getAll,
     createOffer,
     getById,
     updateById,
+    deleteById,
+    rentHousing
 };
