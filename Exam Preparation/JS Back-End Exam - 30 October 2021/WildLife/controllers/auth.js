@@ -1,5 +1,5 @@
-const { isGuest } = require('../middleware/guards');
-const { register } = require('../services/user');
+const { isUser, isGuest } = require('../middleware/guards');
+const { register, login } = require('../services/user');
 const { mapErrors } = require('../util/mappers');
 
 const router = require('express').Router();
@@ -25,6 +25,27 @@ router.post('/register', isGuest(), async (req, res) => {
         const data = { firstName: req.body.firstName, lastName: req.body.lastName, email: req.body.email };
         res.render('register', { title: 'Register Page', data, errors });
     }
+});
+
+router.get('/login', isGuest(), (req, res) => {
+    res.render('login', { title: 'Login Page' });
+});
+
+router.post('/login', isGuest(), async (req, res) => {
+    try {
+        const user = await login(req.body.email, req.body.password);
+        req.session.user = user;
+        res.redirect('/');
+    } catch (err) {
+        console.error(err);
+        const errors = mapErrors(err);
+        res.render('login', { data: { title: 'Login Page', email: req.body.email }, errors });
+    }
+});
+
+router.get('/logout', isUser(), (req, res) => {
+    delete req.session.user;
+    res.redirect('/');
 });
 
 module.exports = router;

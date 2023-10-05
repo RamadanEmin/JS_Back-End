@@ -1,5 +1,5 @@
 const User = require('../models/User');
-const { hash } = require('bcrypt');
+const { hash, compare } = require('bcrypt');
 
 async function register(firstName, lastName, email, password) {
     const existing = await getUserByEmail(email);
@@ -20,6 +20,22 @@ async function register(firstName, lastName, email, password) {
     return user;
 }
 
+async function login(email, password) {
+    const user = await getUserByEmail(email);
+
+    if (!user) {
+        throw new Error('Incorrect email or password');
+    }
+
+    const hasMatch = await compare(password, user.hashedPassword);
+
+    if (!hasMatch) {
+        throw new Error('Incorrect email or password');
+    }
+
+    return user;
+}
+
 async function getUserByEmail(email) {
     const user = User.findOne({ email: new RegExp(`^${email}$`, 'i') });
 
@@ -27,5 +43,6 @@ async function getUserByEmail(email) {
 }
 
 module.exports = {
+    login,
     register
 };
