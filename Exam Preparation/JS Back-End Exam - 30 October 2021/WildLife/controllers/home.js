@@ -1,4 +1,4 @@
-const { getPosts} = require('../services/post');
+const { getPosts, getPostById } = require('../services/post');
 const { postViewModel } = require('../util/mappers');
 
 const router = require('express').Router();
@@ -10,6 +10,22 @@ router.get('/', (req, res) => {
 router.get('/catalog', async (req, res) => {
     const posts = (await getPosts()).map(postViewModel);
     res.render('catalog', { title: 'Catalog', posts });
+});
+
+router.get('/catalog/:id', async (req, res) => {
+    const id = req.params.id;
+    const post = postViewModel(await getPostById(id));
+
+    if (req.session.user) {
+        post.hasUser = true;
+        if (req.session.user._id == post.author._id) {
+            post.isAuthor = true;
+        } else {
+            post.hasVoted = post.votes.find(v => v._id == req.session.user._id) != undefined;
+        }
+    }
+
+    res.render('details', { title: post.title, post });
 });
 
 module.exports = router;

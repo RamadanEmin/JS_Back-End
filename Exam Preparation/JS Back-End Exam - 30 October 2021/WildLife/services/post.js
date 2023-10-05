@@ -11,7 +11,12 @@ async function getPosts() {
     return Post.find({});
 }
 
+async function getPostById(id) {
+    return Post.findById(id).populate('author', 'firstName lastName').populate('votes', 'email');
+}
+
 module.exports = {
     createPost,
     getPosts,
+    getPostById,
 };
