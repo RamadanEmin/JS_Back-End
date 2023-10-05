@@ -7,6 +7,11 @@ async function createPost(post) {
     return result;
 }
 
+async function getPosts() {
+    return Post.find({});
+}
+
 module.exports = {
     createPost,
+    getPosts,
 };
