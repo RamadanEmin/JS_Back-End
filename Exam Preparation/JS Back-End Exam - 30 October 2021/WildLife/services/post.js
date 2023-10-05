@@ -11,6 +11,10 @@ async function getPosts() {
     return Post.find({});
 }
 
+async function getPostsByAuthor(userId) {
+    return Post.find({ author: userId }).populate('author', 'firstName lastName');
+}
+
 async function getPostById(id) {
     return Post.findById(id).populate('author', 'firstName lastName').populate('votes', 'email');
 }
@@ -52,4 +56,5 @@ module.exports = {
     updatePost,
     deletePost,
     vote,
+    getPostsByAuthor
 };
