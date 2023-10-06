@@ -1,9 +1,10 @@
 const artController = require('express').Router();
 const { body, validationResult } = require('express-validator');
 
-const { hasUser } = require('../middlewares/guards');
+const { hasUser, isOwner } = require('../middlewares/guards');
 const { createArt } = require('../services/artService');
 const { parseError } = require('../util/parser');
+const preload = require('../middlewares/preload');
 
 artController.get('/create', hasUser(), (req, res) => {
     res.render('create', { title: 'Create Page' });
@@ -46,5 +47,22 @@ artController.post('/create',
             });
         }
     });
+
+artController.get('/:id', preload(true), (req, res) => {
+    const art = res.locals.art;
+
+    if (req.user) {
+        art.isOwner = req.user._id.toString() === art.owner._id.toString();
+        art.hasShared = art.users.map(u => u.toString()).includes(req.user._id.toString());
+    }
+
+    res.render('details', { title: art.title, art });
+});
+
+artController.get('/:id/edit', hasUser(), preload(true), isOwner(), (req, res) => {
+    const art = res.locals.art;
+
+    res.render('edit', { title: 'Edit Page', art });
+});
 
 module.exports = artController;
