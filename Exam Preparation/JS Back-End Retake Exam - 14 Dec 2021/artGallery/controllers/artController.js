@@ -2,7 +2,7 @@ const artController = require('express').Router();
 const { body, validationResult } = require('express-validator');
 
 const { hasUser, isOwner } = require('../middlewares/guards');
-const { createArt, updateArt } = require('../services/artService');
+const { createArt, updateArt, deleteArt, sharedArt } = require('../services/artService');
 const { parseError } = require('../util/parser');
 const preload = require('../middlewares/preload');
 
@@ -99,5 +99,21 @@ artController.post('/:id/edit',
             });
         }
     });
+
+artController.get('/:id/delete', hasUser(), preload(), isOwner(), async (req, res) => {
+    await deleteArt(req.params.id);
+    res.redirect('/gallery');
+});
+
+artController.get('/:id/share', hasUser(), preload(), async (req, res) => {
+    const art = res.locals.art;
+
+    if (art.owner._id.toString() !== req.user._id.toString() &&
+        !art.users.map(u => u.toString()).includes(req.user._id.toString())) {
+        await sharedArt(art, req.user._id);
+    }
+
+    res.redirect(`/art/${req.params.id}`);
+});
 
 module.exports = artController;
