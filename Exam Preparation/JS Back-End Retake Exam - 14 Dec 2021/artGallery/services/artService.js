@@ -12,8 +12,18 @@ async function createArt(art) {
     return Art.create(art);
 }
 
+async function updateArt(art, data) {
+    art.title = data.title;
+    art.technique = data.technique;
+    art.certificate = data.certificate;
+    art.picture = data.picture;
+
+    return art.save();
+}
+
 module.exports = {
     getAll,
     getById,
     createArt,
+    updateArt,
 };

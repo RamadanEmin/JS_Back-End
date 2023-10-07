@@ -2,7 +2,7 @@ const artController = require('express').Router();
 const { body, validationResult } = require('express-validator');
 
 const { hasUser, isOwner } = require('../middlewares/guards');
-const { createArt } = require('../services/artService');
+const { createArt, updateArt } = require('../services/artService');
 const { parseError } = require('../util/parser');
 const preload = require('../middlewares/preload');
 
@@ -64,5 +64,40 @@ artController.get('/:id/edit', hasUser(), preload(true), isOwner(), (req, res) =
 
     res.render('edit', { title: 'Edit Page', art });
 });
+
+artController.post('/:id/edit',
+    hasUser(),
+    preload(),
+    isOwner(),
+    body('title')
+        .isLength({ min: 6 }).withMessage('Title should be at least 6 characters long'),
+    body('technique')
+        .isLength({ max: 15 }).withMessage('Technique should be at most 15 characters long'),
+    body('certificate')
+        .matches(/^(?:yes|no)$/i).withMessage('Yes or No are only valid'),
+    body('picture')
+        .matches(/^https?:\/\/.+$/i).withMessage('Invalid pucture, should start with http:// or https://'),
+    async (req, res) => {
+        const art = res.locals.art;
+
+        try {
+            const { errors } = validationResult(req);
+            if (errors.length > 0) {
+                throw errors;
+            }
+
+            await updateArt(art, req.body);
+            res.redirect(`/art/${req.params.id}`);
+        } catch (error) {
+            req.body._id = req.params.id;
+            console.log(error);
+            const errors = parseError(error);
+            res.render('edit', {
+                title: 'Edit Page',
+                errors,
+                art: req.body
+            });
+        }
+    });
 
 module.exports = artController;
