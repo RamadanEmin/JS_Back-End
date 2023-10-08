@@ -8,4 +8,10 @@ homeController.get("/", async (req, res) => {
   res.render('home', { title: 'Home Page', adds });
 });
 
+homeController.get("/catalog", async (req, res) => {
+  const adds = await getAll();
+
+  res.render('catalog', { title: 'Catalog Page', adds });
+});
+
 module.exports = homeController;
