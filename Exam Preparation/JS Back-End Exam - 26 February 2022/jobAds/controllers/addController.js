@@ -1,7 +1,7 @@
 const addController = require("express").Router();
 
 const { hasUser } = require("../middlewares/guards");
-const { create, getById } = require("../services/addService");
+const { create, getById, update, applyAdd, deleteById } = require("../services/addService");
 const { parseError } = require("../util/parser");
 
 addController.get('/create', hasUser(), (req, res) => {
@@ -72,6 +72,28 @@ addController.post('/:id/edit', hasUser(), async (req, res) => {
             add: req.body
         });
     }
+});
+
+addController.get('/:id/delete', hasUser(), async (req, res) => {
+    const trip = await getById(req.params.id);
+  
+    if (trip.owner._id.toString() !== req.user._id.toString()) {
+      return res.redirect('/auth/login');
+    }
+  
+    await deleteById(req.params.id);
+    res.redirect('/catalog');
+  });
+
+addController.get('/:id/apply', hasUser(), async (req, res) => {
+    const add = await getById(req.params.id);
+
+    if (add.owner._id.toString() !== req.user._id.toString() &&
+        !add.users.map(u => u._id.toString()).includes(req.user._id.toString())) {
+        await applyAdd(req.params.id, req.user._id);
+    }
+
+    return res.redirect(`/add/${req.params.id}`);
 });
 
 module.exports = addController;

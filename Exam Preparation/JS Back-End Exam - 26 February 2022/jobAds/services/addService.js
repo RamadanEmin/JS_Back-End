@@ -32,9 +32,21 @@ const update = async (id, data) => {
     return existing.save();
 };
 
+const deleteById = async (id) => Add.findByIdAndDelete(id);
+
+const applyAdd = async (addId, userId) => {
+    const existing = await Add.findById(addId);
+    existing.users.push(userId);
+    existing.usersCount++;
+
+    return existing.save();
+};
+
 module.exports = {
     getAll,
     create,
     getById,
     update,
+    deleteById,
+    applyAdd
 };
