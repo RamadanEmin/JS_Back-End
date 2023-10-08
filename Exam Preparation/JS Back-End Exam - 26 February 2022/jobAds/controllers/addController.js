@@ -43,4 +43,35 @@ addController.get('/:id', async (req, res) => {
     res.render('details', { title: 'Details Page', add });
 });
 
+addController.get('/:id/edit', hasUser(), async (req, res) => {
+    const add = await getById(req.params.id);
+
+    if (add.owner._id.toString() !== req.user._id.toString()) {
+        res.redirect('/auth/login');
+    }
+
+    res.render('edit', { title: 'Edit page', add });
+});
+
+addController.post('/:id/edit', hasUser(), async (req, res) => {
+    const add = await getById(req.params.id);
+
+    if (add.owner._id.toString() !== req.user._id.toString()) {
+        res.redirect('/auth/login');
+    }
+
+    try {
+        await update(req.params.id, req.body);
+        res.redirect(`/add/${req.params.id}`)
+    } catch (error) {
+        console.error(error);
+        const errors = parseError(error);
+        res.render("edit", {
+            title: "Edit Page",
+            errors,
+            add: req.body
+        });
+    }
+});
+
 module.exports = addController;

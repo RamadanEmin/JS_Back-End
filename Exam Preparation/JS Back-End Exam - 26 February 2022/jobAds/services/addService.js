@@ -21,8 +21,20 @@ const getById = async (id) => {
     return Add.findById(id).populate('owner', 'email').populate('users', 'email description').lean();
 }
 
+const update = async (id, data) => {
+    const existing = await Add.findById(id);
+
+    existing.headline = data.headline;
+    existing.location = data.location;
+    existing.company = data.company;
+    existing.description = data.description;
+
+    return existing.save();
+};
+
 module.exports = {
     getAll,
     create,
     getById,
+    update,
 };
