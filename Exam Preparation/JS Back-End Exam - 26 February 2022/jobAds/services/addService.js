@@ -13,6 +13,11 @@ const getAll = async (search, limit) => {
     return Add.find(query).lean();
 };
 
+const create = async (data) => {
+    return Add.create(data);
+}
+
 module.exports = {
     getAll,
+    create,
 };
