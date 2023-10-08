@@ -17,7 +17,12 @@ const create = async (data) => {
     return Add.create(data);
 }
 
+const getById = async (id) => {
+    return Add.findById(id).populate('owner', 'email').populate('users', 'email description').lean();
+}
+
 module.exports = {
     getAll,
     create,
+    getById,
 };
