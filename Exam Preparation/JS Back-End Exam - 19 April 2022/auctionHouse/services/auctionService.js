@@ -18,9 +18,21 @@ const update = async (id, data) => {
     return existing.save();
 };
 
+const deleteById = async (id) => Auction.findByIdAndDelete(id);
+
+const bidAuction = async (auctionId, userId, amount) => {
+    const existing = await Auction.findById(auctionId);
+    existing.bidder = userId;
+    existing.price = amount;
+
+    return existing.save();
+};
+
 module.exports = {
     getAll,
     getById,
     create,
     update,
+    deleteById,
+    bidAuction,
 };
