@@ -28,6 +28,15 @@ const bidAuction = async (auctionId, userId, amount) => {
     return existing.save();
 };
 
+const closeAuction = async (auctionId) => {
+    const existing = await Auction.findById(auctionId);
+    existing.close = true;
+
+    return existing.save();
+};
+
+const getAllClosed = async () => Auction.find({ close: true }).populate('bidder').lean();
+
 module.exports = {
     getAll,
     getById,
@@ -35,4 +44,6 @@ module.exports = {
     update,
     deleteById,
     bidAuction,
+    closeAuction,
+    getAllClosed
 };

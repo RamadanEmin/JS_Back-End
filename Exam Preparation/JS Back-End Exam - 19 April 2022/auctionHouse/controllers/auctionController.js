@@ -1,5 +1,5 @@
 const { hasUser } = require("../middlewares/guards");
-const { create, getById, update, deleteById, bidAuction } = require("../services/auctionService");
+const { create, getById, update, deleteById, bidAuction, closeAuction } = require("../services/auctionService");
 const { parseError } = require("../util/parser");
 
 const auctionController = require("express").Router();
@@ -110,6 +110,11 @@ auctionController.post('/:id/bid', hasUser(), async (req, res) => {
             auction
         });
     }
+});
+
+auctionController.get('/:id/close', hasUser(), async (req, res) => {
+    await closeAuction(req.params.id);
+    res.redirect('/closed-auctions');
 });
 
 module.exports = auctionController;
