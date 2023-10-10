@@ -1,5 +1,5 @@
 const { hasUser } = require("../middlewares/guards");
-const { create, getById } = require("../services/auctionService");
+const { create, getById, update } = require("../services/auctionService");
 const { parseError } = require("../util/parser");
 
 const auctionController = require("express").Router();
@@ -43,6 +43,36 @@ auctionController.get('/:id', hasUser(), async (req, res) => {
     }
 
     res.render('details', { title: 'Details', auction })
+});
+
+auctionController.get('/:id/edit', hasUser(), async (req, res) => {
+    const auction = await getById(req.params.id);
+
+    if (auction.owner.toString() !== req.user._id.toString()) {
+        res.redirect('/auth/login');
+    }
+
+    res.render('edit', { title: 'Edit', auction });
+});
+
+auctionController.post('/:id/edit', hasUser(), async (req, res) => {
+    const auction = await getById(req.params.id);
+
+    if (auction.owner.toString() !== req.user._id.toString()) {
+        res.redirect('/auth/login');
+    }
+
+    try {
+        await update(req.params.id, req.body);
+        res.redirect(`/auction/${req.params.id}`);
+    } catch (error) {
+        const errors = parseError(error);
+        res.render('edit', {
+            title: 'Edit',
+            errors,
+            auction: req.body
+        });
+    }
 });
 
 module.exports = auctionController;
