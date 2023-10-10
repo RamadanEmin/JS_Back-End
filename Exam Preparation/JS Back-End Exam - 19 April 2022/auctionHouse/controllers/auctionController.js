@@ -1,5 +1,5 @@
 const { hasUser } = require("../middlewares/guards");
-const { create } = require("../services/auctionService");
+const { create, getById } = require("../services/auctionService");
 const { parseError } = require("../util/parser");
 
 const auctionController = require("express").Router();
@@ -30,6 +30,19 @@ auctionController.post('/create', hasUser(), async (req, res) => {
             auction
         });
     }
+});
+
+auctionController.get('/:id', hasUser(), async (req, res) => {
+    const auction = await getById(req.params.id);
+
+    if (req.user) {
+        auction.isOwner = req.user._id.toString() === auction.owner.toString();
+    }
+    if (auction.bidder) {
+        auction.hasBid = auction.bidder._id == req.user._id;
+    }
+
+    res.render('details', { title: 'Details', auction })
 });
 
 module.exports = auctionController;
