@@ -1,5 +1,5 @@
 const { hasUser } = require("../middlewares/guards");
-const { create, getById, update } = require("../services/cryptoService");
+const { create, getById, update, deleteById, buyCrypto } = require("../services/cryptoService");
 const { parseError } = require("../util/parser");
 
 const cryptoController = require("express").Router();
@@ -70,6 +70,28 @@ cryptoController.post('/:id/edit', hasUser(), async (req, res) => {
             crypto: req.body
         });
     }
+});
+
+cryptoController.get('/:id/delete', hasUser(), async (req, res) => {
+    const crypto = await getById(req.params.id);
+
+    if (crypto.owner.toString() !== req.user._id.toString()) {
+        res.redirect('/auth/login');
+    }
+
+    await deleteById(req.params.id);
+    res.redirect('/catalog');
+});
+
+cryptoController.get('/:id/buy', hasUser(), async (req, res) => {
+    const crypto = await getById(req.params.id);
+
+    if (crypto.owner.toString() !== req.user._id.toString() &&
+        !crypto.buyers.map(b => b.toString()).includes(req.user._id.toString())) {
+        await buyCrypto(req.params.id, req.user._id);
+    }
+
+    return res.redirect(`/crypto/${req.params.id}`);
 });
 
 module.exports = cryptoController;

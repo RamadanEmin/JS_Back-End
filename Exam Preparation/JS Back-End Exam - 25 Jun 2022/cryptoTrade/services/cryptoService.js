@@ -18,9 +18,20 @@ const update = async (id, data) => {
     existing.save();
 };
 
+const deleteById = async (id) => Crypto.findByIdAndDelete(id);
+
+const buyCrypto = async (cryptoId, userId) => {
+    const existing = await Crypto.findById(cryptoId);
+    existing.buyers.push(userId);
+
+    existing.save();
+};
+
 module.exports = {
     getAll,
     create,
     getById,
     update,
+    deleteById,
+    buyCrypto
 };
