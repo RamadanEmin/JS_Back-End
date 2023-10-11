@@ -2,6 +2,14 @@ const Crypto = require('../models/Crypto');
 
 const getAll = async () =>  Crypto.find({}).lean();
 
+const searchCrypto = async (name, payment) => {
+    let crypto = await Crypto.find({
+        name: { $regex: new RegExp(name, "i") },
+    }).lean();
+    crypto = crypto.filter((c) => c.payment == payment);
+    return crypto;
+}
+
 const create = async (data) => Crypto.create(data);
 
 const getById = async (id) => Crypto.findById(id).lean();
@@ -29,6 +37,7 @@ const buyCrypto = async (cryptoId, userId) => {
 
 module.exports = {
     getAll,
+    searchCrypto,
     create,
     getById,
     update,
