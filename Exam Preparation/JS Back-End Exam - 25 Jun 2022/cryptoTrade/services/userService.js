@@ -26,6 +26,24 @@ async function register(email, username, password) {
   return token;
 }
 
+async function login(email, password) {
+  const user = await User.findOne({ email }).collation({
+    locale: "en",
+    strength: 2,
+  });
+  if (!user) {
+    throw new Error("Incorect email or passwrod");
+  }
+
+  const hasMatch = await bcrypt.compare(password, user.hashedPassword);
+  if (hasMatch == false) {
+    throw new Error("Incorect email or passwsord!");
+  }
+
+  const token = createSession(user);
+  return token;
+}
+
 function createSession({ _id, email, username }) {
   const payload = {
     _id,
@@ -42,6 +60,7 @@ function verifyToken(token) {
 }
 
 module.exports = {
+  login,
   register,
   verifyToken,
 };
