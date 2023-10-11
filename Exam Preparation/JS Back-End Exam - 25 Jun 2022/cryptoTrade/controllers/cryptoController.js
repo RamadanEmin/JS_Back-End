@@ -1,5 +1,5 @@
 const { hasUser } = require("../middlewares/guards");
-const { create } = require("../services/cryptoService");
+const { create, getById } = require("../services/cryptoService");
 const { parseError } = require("../util/parser");
 
 const cryptoController = require("express").Router();
@@ -29,6 +29,17 @@ cryptoController.post('/create', hasUser(), async (req, res) => {
             crypto
         });
     }
+});
+
+cryptoController.get('/:id', async (req, res) => {
+    const crypto = await getById(req.params.id);
+
+    if (req.user) {
+        crypto.isOwner = crypto.owner.toString() === req.user._id.toString();
+        crypto.hasBought = crypto.buyers.map(b => b.toString()).includes(req.user._id.toString());
+    }
+
+    res.render('details', { title: 'Details', crypto });
 });
 
 module.exports = cryptoController;
