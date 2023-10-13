@@ -19,9 +19,20 @@ const update = async (id, data) => {
     existing.save();
 };
 
+const deleteById = async (id) => Book.findByIdAndDelete(id);
+
+const wishBook = async (bookId, userId) => {
+    const book = await Book.findById(bookId);
+    book.wishingList.push(userId);
+
+    book.save();
+};
+
 module.exports = {
     getAll,
     getById,
     create,
     update,
+    deleteById,
+    wishBook,
 };
