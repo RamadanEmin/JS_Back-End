@@ -1,5 +1,5 @@
 const { hasUser } = require("../middlewares/guards");
-const { create, getById } = require("../services/bookService");
+const { create, getById, update } = require("../services/bookService");
 const { parseError } = require("../util/parser");
 
 const bookController = require("express").Router();
@@ -42,6 +42,37 @@ bookController.get('/:id', async (req, res) => {
     }
 
     res.render('details', { title: 'Details Page', book });
+});
+
+bookController.get('/:id/edit', hasUser(), async (req, res) => {
+    const book = await getById(req.params.id);
+
+    if (book.owner.toString() !== req.user._id.toString()) {
+        res.redirect('/auth/login');
+    }
+
+    res.render('edit', { title: 'Edit Page', book });
+});
+
+bookController.post('/:id/edit', hasUser(), async (req, res) => {
+    const book = await getById(req.params.id);
+
+    if (book.owner.toString() !== req.user._id.toString()) {
+        res.redirect('/auth/login');
+    }
+
+    try {
+        await update(req.params.id, req.body);
+        res.redirect(`/book/${req.params.id}`);
+    } catch (error) {
+        console.log(error);
+        const errors = parseError(error);
+        res.render('edit', {
+            title: 'Edit Page',
+            errors,
+            book: req.body
+        });
+    }
 });
 
 module.exports = bookController;
