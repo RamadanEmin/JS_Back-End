@@ -1,5 +1,5 @@
 const { hasUser } = require("../middlewares/guards");
-const { create } = require("../services/bookService");
+const { create, getById } = require("../services/bookService");
 const { parseError } = require("../util/parser");
 
 const bookController = require("express").Router();
@@ -31,6 +31,17 @@ bookController.post('/create', hasUser(), async (req, res) => {
             book
         });
     }
+});
+
+bookController.get('/:id', async (req, res) => {
+    const book = await getById(req.params.id);
+
+    if (req.user) {
+        book.isOwner = book.owner.toString() === req.user._id.toString();
+        book.isWish = book.wishingList.map(w => w.toString()).includes(req.user._id.toString());
+    }
+
+    res.render('details', { title: 'Details Page', book });
 });
 
 module.exports = bookController;
