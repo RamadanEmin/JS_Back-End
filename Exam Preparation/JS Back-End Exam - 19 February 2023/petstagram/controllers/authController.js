@@ -1,5 +1,8 @@
 const authController = require('express').Router();
-const { register } = require('../services/userService');
+const { hasUser, isGuest } = require('../middlewares/guards');
+const { register, login } = require('../services/userService');
+const { parseError } = require('../utils/parser');
+
 
 authController.get('/register', isGuest(), (req, res) => {
   res.render('register', {
@@ -36,6 +39,34 @@ authController.post('/register', isGuest(), async (req, res) => {
       }
     });
   }
+});
+
+authController.get('/login', isGuest(), (req, res) => {
+  res.render('login', {
+    title: 'Login'
+  });
+});
+
+authController.post('/login', isGuest(), async (req, res) => {
+  try {
+    const token = await login(req.body.username, req.body.password);
+
+    res.cookie('token', token);
+    res.redirect('/');
+  } catch (error) {
+    res.render('login', {
+      title: 'Login',
+      errors: parseError(error),
+      body: {
+        username: req.body.username
+      }
+    });
+  }
+});
+
+authController.get('/logout', hasUser(), (req, res) => {
+  res.clearCookie('token');
+  res.redirect('/');
 });
 
 module.exports = authController;
