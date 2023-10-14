@@ -28,6 +28,8 @@ const wishBook = async (bookId, userId) => {
     book.save();
 };
 
+const getWishes = async (userId) => Book.find({ wishingList: userId }).lean();
+
 module.exports = {
     getAll,
     getById,
@@ -35,4 +37,5 @@ module.exports = {
     update,
     deleteById,
     wishBook,
+    getWishes
 };
