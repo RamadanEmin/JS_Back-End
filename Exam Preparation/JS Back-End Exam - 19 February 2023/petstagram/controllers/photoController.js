@@ -1,0 +1,36 @@
+const { hasUser } = require('../middlewares/guards');
+const { create } = require('../services/photoService');
+const { parseError } = require('../utils/parser');
+
+const photoController = require('express').Router();
+
+
+photoController.get('/create', hasUser(), (req, res) => {
+  res.render('create', {
+    title: 'Create'
+  });
+});
+
+photoController.post('/create', hasUser(), async (req, res) => {
+  const photo = {
+    name: req.body.name,
+    image: req.body.image,
+    age: Number(req.body.age),
+    description: req.body.description,
+    location: req.body.location,
+    owner: req.user._id
+  };
+
+  try {
+    await create(photo);
+    res.redirect('/catalog');
+  } catch (error) {
+    res.render('create', {
+      title: 'Create',
+      errors: parseError(error),
+      photo
+    });
+  }
+});
+
+module.exports = photoController;
