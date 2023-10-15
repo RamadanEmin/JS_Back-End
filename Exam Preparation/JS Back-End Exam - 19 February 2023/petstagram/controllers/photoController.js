@@ -1,5 +1,5 @@
 const { hasUser } = require('../middlewares/guards');
-const { create } = require('../services/photoService');
+const { create, getById } = require('../services/photoService');
 const { parseError } = require('../utils/parser');
 
 const photoController = require('express').Router();
@@ -31,6 +31,19 @@ photoController.post('/create', hasUser(), async (req, res) => {
       photo
     });
   }
+});
+
+photoController.get('/:id', async (req, res) => {
+  const photo = await getById(req.params.id);
+
+  if (req.user) {
+    photo.isOwner = req.user._id.toString() === photo.owner._id.toString();
+  }
+
+  res.render('details', {
+    title: 'Details',
+    photo
+  });
 });
 
 module.exports = photoController;
