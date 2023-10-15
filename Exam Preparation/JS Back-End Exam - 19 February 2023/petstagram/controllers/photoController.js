@@ -1,5 +1,5 @@
 const { hasUser } = require('../middlewares/guards');
-const { create, getById } = require('../services/photoService');
+const { create, getById, update } = require('../services/photoService');
 const { parseError } = require('../utils/parser');
 
 const photoController = require('express').Router();
@@ -44,6 +44,38 @@ photoController.get('/:id', async (req, res) => {
     title: 'Details',
     photo
   });
+});
+
+photoController.get('/:id/edit', hasUser(), async (req, res) => {
+  const photo = await getById(req.params.id);
+
+  if (photo.owner._id.toString() !== req.user._id.toString()) {
+    res.redirect('/auth/login');
+  }
+
+  res.render('edit', {
+    title: 'Edit',
+    photo
+  });
+});
+
+photoController.post('/:id/edit', hasUser(), async (req, res) => {
+  const photo = await getById(req.params.id);
+
+  if (photo.owner._id.toString() !== req.user._id.toString()) {
+    res.redirect('/auth/login');
+  }
+
+  try {
+    await update(req.params.id, req.body);
+    res.redirect(`/photo/${req.params.id}`);
+  } catch (error) {
+    res.render('edit', {
+      title: 'Edit',
+      errors: parseError(error),
+      photo: req.body
+    });
+  }
 });
 
 module.exports = photoController;
