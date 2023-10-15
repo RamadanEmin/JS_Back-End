@@ -1,5 +1,5 @@
 const { hasUser } = require('../middlewares/guards');
-const { create, getById, update } = require('../services/photoService');
+const { create, getById, commentPhoto, deleteById, update } = require('../services/photoService');
 const { parseError } = require('../utils/parser');
 
 const photoController = require('express').Router();
@@ -46,6 +46,17 @@ photoController.get('/:id', async (req, res) => {
   });
 });
 
+photoController.get('/:id/delete', hasUser(), async (req, res) => {
+  const photo = await getById(req.params.id);
+
+  if (photo.owner._id.toString() !== req.user._id.toString()) {
+    return res.redirect('/auth/login');
+  }
+
+  await deleteById(req.params.id);
+  res.redirect('/catalog');
+});
+
 photoController.get('/:id/edit', hasUser(), async (req, res) => {
   const photo = await getById(req.params.id);
 
@@ -76,6 +87,16 @@ photoController.post('/:id/edit', hasUser(), async (req, res) => {
       photo: req.body
     });
   }
+});
+
+photoController.post('/:id/comment', hasUser(), async (req, res) => {
+  const photo = await getById(req.params.id);
+
+  if (photo.owner._id.toString() !== req.user._id.toString()) {
+    await commentPhoto(req.params.id, req.user._id, req.body.comment);
+  }
+
+  return res.redirect(`/photo/${req.params.id}`);
 });
 
 module.exports = photoController;

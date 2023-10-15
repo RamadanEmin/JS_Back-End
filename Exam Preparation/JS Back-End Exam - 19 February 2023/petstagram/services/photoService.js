@@ -21,9 +21,19 @@ const update = async (id, data) => {
   return existing.save();
 };
 
+const deleteById = async (id) => Photo.findByIdAndDelete(id);
+
+const commentPhoto = async (photoId, userId, comment) => {
+  const existing = await Photo.findById(photoId);
+  existing.commentList.push({ userId, comment });
+  return existing.save();
+};
+
 module.exports = {
   getAll,
   getById,
   create,
   update,
+  deleteById,
+  commentPhoto,
 };
