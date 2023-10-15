@@ -29,6 +29,8 @@ const commentPhoto = async (photoId, userId, comment) => {
   return existing.save();
 };
 
+const getMyPhotos = async (userId) => Photo.find({owner: userId}).lean();
+
 module.exports = {
   getAll,
   getById,
@@ -36,4 +38,5 @@ module.exports = {
   update,
   deleteById,
   commentPhoto,
+  getMyPhotos,
 };

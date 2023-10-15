@@ -1,6 +1,8 @@
-const { getAll } = require('../services/photoService');
+const { hasUser } = require('../middlewares/guards');
+const { getAll, getMyPhotos } = require('../services/photoService');
 
 const homeController = require('express').Router();
+
 
 homeController.get('/', (req, res) => {
   res.render('home', {
@@ -13,6 +15,15 @@ homeController.get('/catalog', async (req, res) => {
 
   res.render('catalog', {
     title: 'Catalog',
+    photos
+  });
+});
+
+homeController.get('/profile', hasUser(), async (req, res) => {
+  const photos = await getMyPhotos(req.user._id);
+
+  res.render('profile', {
+    title: 'Profile',
     photos
   });
 });
