@@ -1,5 +1,5 @@
 const { hasUser } = require('../middlewares/guards');
-const { create, getById } = require('../services/gameService');
+const { create, getById, update } = require('../services/gameService');
 const { parseError } = require('../util/parser');
 
 const gameController = require('express').Router();
@@ -42,6 +42,50 @@ gameController.get('/:id', async (req, res) => {
     }
 
     res.render('details', { title: 'Details Page', idStyle: 'details', game });
+});
+
+gameController.get('/:id/edit', hasUser(), async (req, res) => {
+    const game = await getById(req.params.id);
+    const platformMap = {
+        'PC': 'PC',
+        'Nintendo': 'Nintendo',
+        'PS4': 'PS4',
+        'PS5': 'PS5',
+        'XBOX': 'XBOX'
+    };
+
+    if (game.owner.toString() !== req.user._id.toString()) {
+        res.redirect('/auth/login');
+    }
+
+    const platform = Object.keys(platformMap).map(key => ({
+        value: key,
+        label: platformMap[key],
+        isSelected: game.platform == key
+    }));
+
+    res.render('edit', { title: 'Edit Page', idStyle: 'edit', game, platform });
+});
+
+gameController.post('/:id/edit', hasUser(), async (req, res) => {
+    const game = await getById(req.params.id);
+
+    if (game.owner.toString() !== req.user._id.toString()) {
+        res.redirect('/auth/login');
+    }
+
+    try {
+        await update(req.params.id, req.body);
+        res.redirect(`/game/${req.params.id}`);
+    } catch (error) {
+        const errors = parseError(error);
+        res.render('edit', {
+            title: 'Edit Page',
+            idStyle: 'edit',
+            errors,
+            game
+        });
+    }
 });
 
 module.exports = gameController;
