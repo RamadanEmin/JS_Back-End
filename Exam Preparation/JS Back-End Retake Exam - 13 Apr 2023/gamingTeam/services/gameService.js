@@ -19,9 +19,20 @@ const update = async (gameId, data) => {
     existing.save();
 };
 
+const deleteById = async (gameId) => Game.findByIdAndDelete(gameId);
+
+const buyGame = async (gameId, userId) => {
+    const existing = await Game.findById(gameId);
+    existing.boughtBy.push(userId);
+
+    existing.save();
+};
+
 module.exports = {
     getAll,
     getById,
     create,
     update,
+    deleteById,
+    buyGame,
 };
