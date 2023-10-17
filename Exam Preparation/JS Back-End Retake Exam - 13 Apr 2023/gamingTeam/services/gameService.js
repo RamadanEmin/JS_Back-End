@@ -28,6 +28,19 @@ const buyGame = async (gameId, userId) => {
     existing.save();
 };
 
+const searchGame = async (name, platform) => {
+    let games = await getAll();
+
+    if(name){
+        games = await Game.find({name: { $regex: new RegExp(name, "i") }}).lean();
+    }
+    if(platform){
+        games = games.filter(x => x.platform == platform);
+    }
+
+    return games;
+};
+
 module.exports = {
     getAll,
     getById,
@@ -35,4 +48,5 @@ module.exports = {
     update,
     deleteById,
     buyGame,
+    searchGame
 };

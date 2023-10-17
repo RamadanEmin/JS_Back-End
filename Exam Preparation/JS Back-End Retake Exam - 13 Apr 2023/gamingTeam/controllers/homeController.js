@@ -1,4 +1,4 @@
-const { getAll } = require('../services/gameService');
+const { getAll, searchGame } = require('../services/gameService');
 
 const homeController = require('express').Router();
 
@@ -10,6 +10,13 @@ homeController.get('/catalog', async (req, res) => {
     const games = await getAll();
 
     res.render('catalog', { title: 'Catalog Page', idStyle: 'catalog', games });
+});
+
+homeController.get('/search', async (req, res) => {
+    const { name, platform } = req.query;
+    const games = await searchGame(name, platform);
+
+    res.render('search', { title: 'Search Page', idStyle: 'search', games });
 });
 
 module.exports = homeController;
