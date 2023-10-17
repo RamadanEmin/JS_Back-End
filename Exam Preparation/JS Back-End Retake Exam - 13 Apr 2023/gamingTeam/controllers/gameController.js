@@ -1,5 +1,5 @@
 const { hasUser } = require('../middlewares/guards');
-const { create, getById, update } = require('../services/gameService');
+const { create, getById, update, deleteById, buyGame } = require('../services/gameService');
 const { parseError } = require('../util/parser');
 
 const gameController = require('express').Router();
@@ -86,6 +86,28 @@ gameController.post('/:id/edit', hasUser(), async (req, res) => {
             game
         });
     }
+});
+
+gameController.get('/:id/delete', hasUser(), async (req, res) => {
+    const game = await getById(req.params.id);
+
+    if (game.owner.toString() !== req.user._id.toString()) {
+        res.redirect('/auth/login');
+    }
+
+    await deleteById(req.params.id)
+    res.redirect('/catalog');
+});
+
+gameController.get('/:id/buy', hasUser(), async (req, res) => {
+    const game = await getById(req.params.id);
+
+    if (game.owner.toString() !== req.user._id.toString() &&
+        !game.boughtBy.map(b => b._id.toString()).includes(req.user._id.toString())) {
+        await buyGame(req.params.id, req.user._id);
+    }
+
+    res.redirect(`/game/${req.params.id}`);
 });
 
 module.exports = gameController;
