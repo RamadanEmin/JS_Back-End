@@ -1,5 +1,5 @@
 const { hasUser } = require("../middlewares/guards");
-const { create } = require("../services/animalService");
+const { create, getById } = require("../services/animalService");
 const { parseError } = require("../util/parser");
 
 const animalController = require("express").Router();
@@ -32,6 +32,17 @@ animalController.post('/create', hasUser(), async (req, res) => {
             animal
         });
     }
+});
+
+animalController.get('/:id', async (req, res) => {
+    const animal = await getById(req.params.id);
+
+    if (req.user) {
+        animal.isOwner = animal.owner.toString() === req.user._id.toString();
+        animal.isDonated = animal.donations.map(d => d.toString()).includes(req.user._id.toString());
+    }
+
+    res.render('details', { title: 'Details page', animal });
 });
 
 module.exports = animalController;

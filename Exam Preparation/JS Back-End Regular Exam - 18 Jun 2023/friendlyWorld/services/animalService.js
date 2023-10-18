@@ -11,10 +11,13 @@ const getAll = async (search) => {
     return Animal.find(query).lean()
 };
 
+const getById = async (animalId) => Animal.findById(animalId).lean();
+
 const create = async (data) => Animal.create(data);
 
 module.exports = {
     getLastAnimal,
     getAll,
+    getById,
     create,
 };
