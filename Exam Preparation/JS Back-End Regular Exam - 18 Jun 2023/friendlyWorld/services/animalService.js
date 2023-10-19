@@ -15,6 +15,13 @@ const getById = async (animalId) => Animal.findById(animalId).lean();
 
 const create = async (data) => Animal.create(data);
 
+const donate = async (animalId, userId) => {
+    const existing = await Animal.findById(animalId);
+    existing.donations.push(userId);
+
+    existing.save();
+};
+
 const update = async (animalId, data) => {
     const existing = await Animal.findById(animalId);
     existing.name = data.name;
@@ -35,6 +42,7 @@ module.exports = {
     getAll,
     getById,
     create,
+    donate,
     update,
     deleteById
 };

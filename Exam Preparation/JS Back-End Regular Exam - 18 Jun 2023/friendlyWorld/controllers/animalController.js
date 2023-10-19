@@ -1,5 +1,5 @@
 const { hasUser } = require("../middlewares/guards");
-const { create, getById, update, deleteById } = require("../services/animalService");
+const { create, getById, donate, update, deleteById } = require("../services/animalService");
 const { parseError } = require("../util/parser");
 
 const animalController = require("express").Router();
@@ -43,6 +43,16 @@ animalController.get('/:id', async (req, res) => {
     }
 
     res.render('details', { title: 'Details page', animal });
+});
+
+animalController.get('/:id/donate', async (req, res) => {
+    const animal = await getById(req.params.id);
+
+    if (animal.owner.toString() !== req.user._id.toString() &&
+        !animal.donations.map(d => d.toString()).includes(req.user._id.toString())) {
+        await donate(req.params.id, req.user._id);
+        res.redirect(`/animal/${req.params.id}`);
+    }
 });
 
 animalController.get('/:id/edit', hasUser(), async (req, res) => {
