@@ -28,10 +28,13 @@ const update = async (animalId, data) => {
     existing.save();
 };
 
+const deleteById = async (animalId) => Animal.findByIdAndDelete(animalId);
+
 module.exports = {
     getLastAnimal,
     getAll,
     getById,
     create,
     update,
+    deleteById
 };

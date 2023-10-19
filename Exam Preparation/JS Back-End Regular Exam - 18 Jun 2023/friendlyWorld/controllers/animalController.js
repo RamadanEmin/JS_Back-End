@@ -1,5 +1,5 @@
 const { hasUser } = require("../middlewares/guards");
-const { create, getById, update } = require("../services/animalService");
+const { create, getById, update, deleteById } = require("../services/animalService");
 const { parseError } = require("../util/parser");
 
 const animalController = require("express").Router();
@@ -74,6 +74,17 @@ animalController.post('/:id/edit', hasUser(), async (req, res) => {
             animal: req.body
         });
     }
+});
+
+animalController.get('/:id/delete', hasUser(), async (req, res) => {
+    const animal = await getById(req.params.id);
+
+    if (animal.owner.toString() !== req.user._id.toString()) {
+        res.redirect('/auth/login');
+    }
+
+    await deleteById(req.params.id);
+    res.redirect('/catalog');
 });
 
 module.exports = animalController;
