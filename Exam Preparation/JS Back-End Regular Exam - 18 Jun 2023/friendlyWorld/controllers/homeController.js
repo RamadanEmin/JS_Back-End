@@ -15,4 +15,10 @@ homeController.get('/catalog', async (req, res) => {
     res.render('catalog', { title: 'Catalog Page', animals });
 });
 
+homeController.get('/search', async (req, res) => {
+    const animals = await getAll(req.query.search);
+
+    res.render('search', { title: 'Search Page', animals });
+});
+
 module.exports = homeController;
