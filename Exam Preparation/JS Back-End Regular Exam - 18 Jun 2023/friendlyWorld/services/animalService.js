@@ -15,9 +15,23 @@ const getById = async (animalId) => Animal.findById(animalId).lean();
 
 const create = async (data) => Animal.create(data);
 
+const update = async (animalId, data) => {
+    const existing = await Animal.findById(animalId);
+    existing.name = data.name;
+    existing.years = data.years;
+    existing.kind = data.kind;
+    existing.image = data.image;
+    existing.need = data.need;
+    existing.location = data.location;
+    existing.description = data.description;
+
+    existing.save();
+};
+
 module.exports = {
     getLastAnimal,
     getAll,
     getById,
     create,
+    update,
 };

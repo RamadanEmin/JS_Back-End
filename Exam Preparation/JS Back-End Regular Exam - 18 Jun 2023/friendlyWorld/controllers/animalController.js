@@ -1,5 +1,5 @@
 const { hasUser } = require("../middlewares/guards");
-const { create, getById } = require("../services/animalService");
+const { create, getById, update } = require("../services/animalService");
 const { parseError } = require("../util/parser");
 
 const animalController = require("express").Router();
@@ -43,6 +43,37 @@ animalController.get('/:id', async (req, res) => {
     }
 
     res.render('details', { title: 'Details page', animal });
+});
+
+animalController.get('/:id/edit', hasUser(), async (req, res) => {
+    const animal = await getById(req.params.id);
+
+    if (animal.owner.toString() !== req.user._id.toString()) {
+        res.redirect('/auth/login');
+    }
+
+    res.render('edit', { title: 'Edit page', animal });
+});
+
+animalController.post('/:id/edit', hasUser(), async (req, res) => {
+    const animal = await getById(req.params.id);
+
+    if (animal.owner.toString() !== req.user._id.toString()) {
+        res.redirect('/auth/login');
+    }
+
+    try {
+        await update(req.params.id, req.body);
+        res.redirect(`/animal/${req.params.id}`);
+    } catch (error) {
+        console.log(error);
+        const errors = parseError(error);
+        res.render("edit", {
+            title: "Edit Page",
+            errors,
+            animal: req.body
+        });
+    }
 });
 
 module.exports = animalController;
