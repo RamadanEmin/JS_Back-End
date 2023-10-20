@@ -6,8 +6,21 @@ const getById = async (creatureId) => Creature.findById(creatureId).populate('ow
 
 const create = async (data) => Creature.create(data);
 
+const update = async (creatureId, data) => {
+    const existing = await Creature.findById(creatureId);
+    existing.name = data.name;
+    existing.species = data.species;
+    existing.skinColor = data.skinColor;
+    existing.eyeColor = data.eyeColor;
+    existing.image = data.image;
+    existing.description = data.description;
+
+    existing.save();
+};
+
 module.exports = {
     getAll,
     getById,
     create,
+    update,
 };

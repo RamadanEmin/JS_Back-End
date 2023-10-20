@@ -1,7 +1,7 @@
 const creatureController = require("express").Router();
 
 const { hasUser } = require("../middlewares/guards");
-const { create, getById } = require("../services/creatureService");
+const { create, getById, update } = require("../services/creatureService");
 const { parseError } = require("../util/parser");
 
 creatureController.get('/create', hasUser(), (req, res) => {
@@ -48,6 +48,37 @@ creatureController.get('/:id', async (req, res) => {
     }).join(', ');
 
     res.render('details', { title: 'Details Page', creature });
+});
+
+creatureController.get('/:id/edit', hasUser(), async (req, res) => {
+    const creature = await getById(req.params.id);
+
+    if (creature.owner._id.toString() !== req.user._id.toString()) {
+        res.redirect('/auth/login');
+    }
+
+    res.render('edit', { title: 'Edit Page', creature });
+});
+
+creatureController.post('/:id/edit', hasUser(), async (req, res) => {
+    const creature = await getById(req.params.id);
+
+    if (creature.owner._id.toString() !== req.user._id.toString()) {
+        res.redirect('/auth/login');
+    }
+
+    try {
+        await update(req.params.id, req.body);
+        res.redirect(`/creature/${req.params.id}`);
+    } catch (error) {
+        console.error(error);
+        const errors = parseError(error);
+        res.render('edit', {
+            title: 'Edit Page',
+            errors,
+            creature: req.body
+        });
+    }
 });
 
 module.exports = creatureController;
