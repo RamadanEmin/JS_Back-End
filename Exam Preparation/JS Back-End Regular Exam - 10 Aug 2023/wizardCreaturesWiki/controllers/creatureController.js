@@ -1,7 +1,7 @@
 const creatureController = require("express").Router();
 
 const { hasUser } = require("../middlewares/guards");
-const { create, getById, update } = require("../services/creatureService");
+const { create, getById, update, deleteById } = require("../services/creatureService");
 const { parseError } = require("../util/parser");
 
 creatureController.get('/create', hasUser(), (req, res) => {
@@ -79,6 +79,17 @@ creatureController.post('/:id/edit', hasUser(), async (req, res) => {
             creature: req.body
         });
     }
+});
+
+creatureController.get('/:id/delete', hasUser(), async (req, res) => {
+    const creature = await getById(req.params.id);
+
+    if (creature.owner._id.toString() !== req.user._id.toString()) {
+        res.redirect('/auth/login');
+    }
+
+    await deleteById(req.params.id);
+    res.redirect('/catalog');
 });
 
 module.exports = creatureController;

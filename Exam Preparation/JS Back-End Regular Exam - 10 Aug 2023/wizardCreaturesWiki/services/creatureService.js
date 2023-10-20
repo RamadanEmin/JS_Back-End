@@ -18,9 +18,12 @@ const update = async (creatureId, data) => {
     existing.save();
 };
 
+const deleteById = async (creatureId) => Creature.findByIdAndDelete(creatureId);
+
 module.exports = {
     getAll,
     getById,
     create,
     update,
+    deleteById,
 };
