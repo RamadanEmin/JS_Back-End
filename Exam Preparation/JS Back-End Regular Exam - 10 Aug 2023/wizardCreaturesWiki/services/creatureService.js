@@ -20,10 +20,18 @@ const update = async (creatureId, data) => {
 
 const deleteById = async (creatureId) => Creature.findByIdAndDelete(creatureId);
 
+const giveVote = async (creatureId, userId) => {
+    const existing = await Creature.findById(creatureId);
+    existing.votes.push(userId);
+
+    existing.save();
+};
+
 module.exports = {
     getAll,
     getById,
     create,
     update,
     deleteById,
+    giveVote,
 };

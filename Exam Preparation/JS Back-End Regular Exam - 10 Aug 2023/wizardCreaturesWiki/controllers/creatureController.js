@@ -1,7 +1,7 @@
 const creatureController = require("express").Router();
 
 const { hasUser } = require("../middlewares/guards");
-const { create, getById, update, deleteById } = require("../services/creatureService");
+const { create, getById, update, deleteById, giveVote } = require("../services/creatureService");
 const { parseError } = require("../util/parser");
 
 creatureController.get('/create', hasUser(), (req, res) => {
@@ -90,6 +90,16 @@ creatureController.get('/:id/delete', hasUser(), async (req, res) => {
 
     await deleteById(req.params.id);
     res.redirect('/catalog');
+});
+
+creatureController.get('/:id/vote', hasUser(), async (req, res) => {
+    const creature = await getById(req.params.id);
+
+    if (creature.owner._id.toString() !== req.user._id.toString() &&
+        !creature.votes.map(v => v.toString()).includes(req.user._id.toString())) {
+        await giveVote(req.params.id, req.user._id);
+        res.redirect(`/creature/${req.params.id}`);
+    }
 });
 
 module.exports = creatureController;
