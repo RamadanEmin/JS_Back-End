@@ -27,6 +27,8 @@ const giveVote = async (creatureId, userId) => {
     existing.save();
 };
 
+const getMyPost = async(userId) => Creature.find({ owner: userId }).populate('owner', 'firstName lastName').lean();
+
 module.exports = {
     getAll,
     getById,
@@ -34,4 +36,5 @@ module.exports = {
     update,
     deleteById,
     giveVote,
+    getMyPost
 };
