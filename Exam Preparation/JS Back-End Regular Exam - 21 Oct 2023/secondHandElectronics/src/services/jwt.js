@@ -1,4 +1,3 @@
-//TODO user indetity name from description
 const jwt = require('jsonwebtoken');
 
 const secret = 'super secret';
