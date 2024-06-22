@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { create, getById, update, deleteById } = require('../services/electronics');
+const { create, getById, update, deleteById, buy } = require('../services/electronics');
 const { body, validationResult } = require('express-validator');
 const { isUser } = require('../middlewares/guards');
 const { parseError } = require('../util');
@@ -90,6 +90,19 @@ electronicsController.get('/delete/:id', isUser(), async (req, res) => {
         res.redirect('/catalog');
     } catch (err) {
         res.redirect('/catalog/' + electronicId);
+    }
+});
+
+electronicsController.get('/buy/:id', isUser(), async (req, res) => {
+    const electronicId = req.params.id;
+    const userId = req.user._id;
+
+    try {
+        await buy(electronicId, userId);
+        res.redirect('/catalog/' + electronicId);
+    } catch (err) {
+        console.log(err);
+        res.redirect('/');
     }
 });
 

@@ -69,11 +69,47 @@ async function deleteById(electronicId, userId) {
   await Electronic.findByIdAndDelete(electronicId);
 }
 
+async function buy(electronicId, userId) {
+  const record = await Electronic.findById(electronicId);
+
+  if (!record) {
+    throw new ReferenceError('Record not found!' + electronicId);
+  }
+
+  if (record.owner.toString() == userId) {
+    throw new Error('Access Denied!');
+  }
+
+  if (record.buyingList.find(b => b.toString() == userId)) {
+    return;
+  }
+
+  record.buyingList.push(userId);
+
+  await record.save();
+}
+
+const searchElectronic = async (name, type) => {
+  let electronic = await getAll();
+
+  if (name) {
+    electronic = await Electronic.find({ name: { $regex: new RegExp(name, "i") } }).lean();
+  }
+
+  if (type) {
+    electronic = await Electronic.find({ name: { $regex: new RegExp(type, "i") } }).lean();
+  }
+
+  return electronic;
+};
+
 module.exports = {
   getAll,
   getById,
   update,
   deleteById,
   create,
-  getRecent
+  getRecent,
+  buy,
+  searchElectronic
 }

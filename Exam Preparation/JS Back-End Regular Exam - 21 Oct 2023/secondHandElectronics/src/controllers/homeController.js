@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { getAll, getById } = require('../services/electronics');
+const { getAll, getById, searchElectronic } = require('../services/electronics');
 
 const homeController = Router();
 homeController.get('/', async (req, res) => {
@@ -24,6 +24,13 @@ homeController.get('/catalog/:id', async (req, res) => {
 
     res.render('details', { title: 'Details Page', electronic, isOwner, hasBuyed });
 })
+
+homeController.get('/search', async (req, res) => {
+    const { name, type } = req.query;
+    const electronics = await searchElectronic(name, type);
+
+    res.render('search', { title: 'Search Page', electronics });
+});
 
 module.exports = {
     homeController
