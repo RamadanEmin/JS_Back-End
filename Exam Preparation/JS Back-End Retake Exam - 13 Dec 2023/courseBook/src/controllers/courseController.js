@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { create } = require('../services/courseService');
+const { create, signup } = require('../services/courseService');
 const { body, validationResult } = require('express-validator');
 const { isUser } = require('../middlewares/guards');
 const { parseError } = require('../util');
@@ -33,6 +33,19 @@ courseController.post('/create', isUser(),
         }
     }
 );
+
+courseController.get('/signup/:id', isUser(), async (req, res) => {
+    const courseId = req.params.id;
+    const userId = req.user._id;
+
+    try {
+        await signup(courseId, userId);
+        res.redirect('/catalog/' + courseId);
+    } catch (err) {
+        console.log(err);
+        res.redirect('/');
+    }
+});
 
 module.exports = {
     courseController

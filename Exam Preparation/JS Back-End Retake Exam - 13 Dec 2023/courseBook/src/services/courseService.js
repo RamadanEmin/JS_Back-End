@@ -4,6 +4,10 @@ async function getAll() {
   return Course.find().lean();
 }
 
+async function getById(courseId) {
+  return Course.findById(courseId).populate('signUplist','username').populate('owner','email').lean();
+}
+
 function getRecent() {
   return Course.find().sort({ _id: -1 }).limit(3).lean();
 }
@@ -24,8 +28,30 @@ async function create(data, ownerId) {
   return record;
 }
 
+async function signup(courseId, userId) {
+  const record = await Course.findById(courseId);
+
+  if (!record) {
+    throw new ReferenceError('Record not found!' + courseId);
+  }
+
+  if (record.owner.toString() == userId) {
+    throw new Error('Access Denied!');
+  }
+
+  if (record.signUplist.find(l => l.toString() == userId)) {
+    return;
+  }
+
+  record.signUplist.push(userId);
+
+  await record.save();
+}
+
 module.exports = {
   getAll,
+  getById,
   create,
-  getRecent
+  getRecent,
+  signup,
 }
