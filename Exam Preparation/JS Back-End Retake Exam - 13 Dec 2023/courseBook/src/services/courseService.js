@@ -28,6 +28,43 @@ async function create(data, ownerId) {
   return record;
 }
 
+async function update(courseId, data, userId) {
+  const record = await Course.findById(courseId);
+
+  if (!record) {
+    throw new ReferenceError('Record not found!' + courseId);
+  }
+
+  if (record.owner.toString() != userId) {
+    throw new Error('Access Denied!');
+  }
+
+  record.title = data.title;
+  record.type = data.type;
+  record.certificate = data.certificate;
+  record.image = data.image;
+  record.description = data.description;
+  record.price = data.price;
+
+  await record.save();
+
+  return record;
+}
+
+async function deleteById(courseId, userId) {
+  const record = await Course.findById(courseId);
+
+  if (!record) {
+    throw new ReferenceError('Record not found!' + courseId);
+  }
+
+  if (record.owner.toString() != userId) {
+    throw new Error('Access Denied!');
+  }
+
+  await Course.findByIdAndDelete(courseId);
+}
+
 async function signup(courseId, userId) {
   const record = await Course.findById(courseId);
 
@@ -51,7 +88,9 @@ async function signup(courseId, userId) {
 module.exports = {
   getAll,
   getById,
+  update,
+  deleteById,
   create,
   getRecent,
-  signup,
+  signup
 }
