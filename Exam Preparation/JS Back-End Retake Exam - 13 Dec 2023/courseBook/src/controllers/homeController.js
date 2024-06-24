@@ -1,5 +1,6 @@
 const { Router } = require('express');
-const { getAll, getRecent, getById } = require('../services/courseService');
+const { getAll, getRecent, getById, getAllMyCreatedCourse, getAllMySignUpCourse } = require('../services/courseService');
+const { isUser } = require('../middlewares/guards');
 
 const homeController = Router();
 
@@ -26,6 +27,16 @@ homeController.get('/catalog/:id', async (req, res) => {
 
     res.render('details', { title: 'Details Page', course, isOwner, hasSignUp });
 })
+
+homeController.get('/profile', isUser(), async (req, res) => {
+    const userId = req.user?._id;
+    const user = req.user?.email;
+
+    const created = await getAllMyCreatedCourse(userId);
+    const joined = await getAllMySignUpCourse(userId);
+
+    res.render('profile', { title: 'Profile Page', user, created, joined });
+});
 
 module.exports = {
     homeController

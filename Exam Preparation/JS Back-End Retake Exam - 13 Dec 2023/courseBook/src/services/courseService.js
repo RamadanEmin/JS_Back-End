@@ -85,6 +85,14 @@ async function signup(courseId, userId) {
   await record.save();
 }
 
+async function getAllMyCreatedCourse(userId) {
+  return Course.find({ owner: userId }).lean();
+}
+
+async function getAllMySignUpCourse(userId) {
+  return Course.find({ signUplist: userId }).lean();
+}
+
 module.exports = {
   getAll,
   getById,
@@ -92,5 +100,7 @@ module.exports = {
   deleteById,
   create,
   getRecent,
-  signup
+  signup,
+  getAllMyCreatedCourse,
+  getAllMySignUpCourse
 }
