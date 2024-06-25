@@ -1,5 +1,5 @@
 const { hasUser } = require('../middlewares/guards');
-const { create, getById } = require('../services/stoneService');
+const { create, getById, update, deleteById } = require('../services/stoneService');
 const { parseError } = require('../util/parser');
 
 const stoneController = require('express').Router();
@@ -43,6 +43,48 @@ stoneController.get('/:id', async (req, res) => {
     }
 
     res.render('details', { title: 'Details page', stone });
+});
+
+stoneController.get('/edit/:id', hasUser(), async (req, res) => {
+    const stone = await getById(req.params.id);
+
+    if (stone.owner.toString() !== req.user._id.toString()) {
+        res.redirect('/login');
+    }
+
+    res.render('edit', { title: 'Edit page', stone });
+});
+
+stoneController.post('/edit/:id', hasUser(), async (req, res) => {
+    const stone = await getById(req.params.id);
+
+    if (stone.owner.toString() !== req.user._id.toString()) {
+        res.redirect('/login');
+    }
+
+    try {
+        await update(req.params.id, req.body);
+        res.redirect(`/stone/${req.params.id}`);
+    } catch (error) {
+        console.log(error);
+        const errors = parseError(error);
+        res.render('edit', {
+            title: 'Edit Page',
+            errors,
+            stone: req.body
+        });
+    }
+});
+
+stoneController.get('/delete/:id', hasUser(), async (req, res) => {
+    const stone = await getById(req.params.id);
+
+    if (stone.owner.toString() !== req.user._id.toString()) {
+        res.redirect('/login');
+    }
+
+    await deleteById(req.params.id);
+    res.redirect('/catalog');
 });
 
 module.exports = stoneController;
