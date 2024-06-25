@@ -1,5 +1,5 @@
 const { hasUser } = require('../middlewares/guards');
-const { create, getById, update, deleteById } = require('../services/stoneService');
+const { create, getById, update, deleteById, like } = require('../services/stoneService');
 const { parseError } = require('../util/parser');
 
 const stoneController = require('express').Router();
@@ -43,6 +43,16 @@ stoneController.get('/:id', async (req, res) => {
     }
 
     res.render('details', { title: 'Details page', stone });
+});
+
+stoneController.get('/like/:id', async (req, res) => {
+    const stone = await getById(req.params.id);
+
+    if (stone.owner.toString() !== req.user._id.toString() &&
+        !stone.likedList.map(d => d.toString()).includes(req.user._id.toString())) {
+        await like(req.params.id, req.user._id);
+        res.redirect(`/stone/${req.params.id}`);
+    }
 });
 
 stoneController.get('/edit/:id', hasUser(), async (req, res) => {
