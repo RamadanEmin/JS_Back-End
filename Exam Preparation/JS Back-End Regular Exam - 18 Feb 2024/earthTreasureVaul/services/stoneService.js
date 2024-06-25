@@ -6,7 +6,10 @@ const getAll = async () => {
     return Stone.find().lean()
 };
 
+const create = async (data) => Stone.create(data);
+
 module.exports = {
     getLastStone,
-    getAll
+    getAll,
+    create
 };
