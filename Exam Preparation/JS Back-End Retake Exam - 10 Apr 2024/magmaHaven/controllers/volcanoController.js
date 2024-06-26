@@ -1,5 +1,5 @@
 const { hasUser } = require('../middlewares/guards');
-const { create } = require('../services/volcanoService');
+const { create, getById } = require('../services/volcanoService');
 const { parseError } = require('../util/parser');
 
 const volcanoController = require('express').Router();
@@ -32,6 +32,17 @@ volcanoController.post('/create', hasUser(), async (req, res) => {
             volcano
         });
     }
+});
+
+volcanoController.get('/:id', async (req, res) => {
+    const volcano = await getById(req.params.id);
+
+    if (req.user) {
+        volcano.isOwner = volcano.owner.toString() === req.user._id.toString();
+        volcano.isVoted = volcano.voteList.map(v => v.toString()).includes(req.user._id.toString());
+    }
+
+    res.render('details', { title: 'Details page', volcano });
 });
 
 module.exports = volcanoController;
