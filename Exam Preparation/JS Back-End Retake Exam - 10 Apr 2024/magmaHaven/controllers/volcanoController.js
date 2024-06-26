@@ -1,5 +1,5 @@
 const { hasUser } = require('../middlewares/guards');
-const { create, getById, vote } = require('../services/volcanoService');
+const { create, getById, update, deleteById, vote } = require('../services/volcanoService');
 const { parseError } = require('../util/parser');
 
 const volcanoController = require('express').Router();
@@ -53,6 +53,65 @@ volcanoController.get('/vote/:id', async (req, res) => {
         await vote(req.params.id, req.user._id);
         res.redirect(`/volcano/${req.params.id}`);
     }
+});
+
+volcanoController.get('/edit/:id', hasUser(), async (req, res) => {
+    const volcano = await getById(req.params.id);
+    const typeMap = {
+        'Supervolcanoes': 'Supervolcanoes',
+        'Submarine': 'Submarine',
+        'Subglacial': 'Subglacial',
+        'Mud': 'Mud',
+        'Stratovolcanoes': 'Stratovolcanoes',
+        'Shield': 'Shield'
+    };
+
+
+    if (volcano.owner.toString() !== req.user._id.toString()) {
+        res.redirect('/login');
+    }
+
+    const typeVolcano = Object.keys(typeMap).map(key => ({
+        value: key,
+        label: typeMap[key],
+        isSelected: volcano.typeVolcano == key
+    }));
+
+    console.log(typeVolcano);
+
+    res.render('edit', { title: 'Edit page', volcano, typeVolcano });
+});
+
+volcanoController.post('/edit/:id', hasUser(), async (req, res) => {
+    const volcano = await getById(req.params.id);
+
+    if (volcano.owner.toString() !== req.user._id.toString()) {
+        res.redirect('/login');
+    }
+
+    try {
+        await update(req.params.id, req.body);
+        res.redirect(`/volcano/${req.params.id}`);
+    } catch (error) {
+        console.log(error);
+        const errors = parseError(error);
+        res.render('edit', {
+            title: 'Edit Page',
+            errors,
+            volcano: req.body
+        });
+    }
+});
+
+volcanoController.get('/delete/:id', hasUser(), async (req, res) => {
+    const volcano = await getById(req.params.id);
+
+    if (volcano.owner.toString() !== req.user._id.toString()) {
+        res.redirect('/login');
+    }
+
+    await deleteById(req.params.id);
+    res.redirect('/catalog');
 });
 
 module.exports = volcanoController;

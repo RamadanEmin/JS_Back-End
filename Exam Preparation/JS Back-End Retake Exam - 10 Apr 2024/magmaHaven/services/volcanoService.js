@@ -15,9 +15,26 @@ const vote = async (volcanoId, userId) => {
     existing.save();
 };
 
+const update = async (volcanoId, data) => {
+    const existing = await Volcano.findById(volcanoId);
+    existing.name = data.name;
+    existing.location = data.location;
+    existing.elevation = data.elevation;
+    existing.lastEruption = data.lastEruption;
+    existing.image = data.image;
+    existing.typeVolcano = data.typeVolcano;
+    existing.description = data.description;
+
+    existing.save();
+};
+
+const deleteById = async (volcanoId) => Volcano.findByIdAndDelete(volcanoId);
+
 module.exports = {
     getAll,
     getById,
     create,
-    vote
+    vote,
+    update,
+    deleteById
 };
