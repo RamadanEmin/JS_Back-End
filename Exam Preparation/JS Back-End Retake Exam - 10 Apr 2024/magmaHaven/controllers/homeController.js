@@ -1,4 +1,4 @@
-const { getAll, searchVolcano } = require('../services/volcanoService');
+const { getAll } = require('../services/volcanoService');
 
 const homeController = require('express').Router();
 
