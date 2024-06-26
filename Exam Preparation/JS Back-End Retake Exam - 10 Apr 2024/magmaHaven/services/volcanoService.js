@@ -4,6 +4,9 @@ const getAll = async () => {
     return Volcano.find({}).lean()
 };
 
+const create = async (data) => Volcano.create(data);
+
 module.exports = {
-    getAll
+    getAll,
+    create
 };
