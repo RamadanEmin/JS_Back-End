@@ -4,6 +4,19 @@ const getAll = async () => {
     return Volcano.find({}).lean()
 };
 
+const searchVolcano = async (name, typeVolcano) => {
+    let volcano = await getAll();
+
+    if(name){
+        volcano = await Volcano.find({name: { $regex: new RegExp(name, "i") }}).lean();
+    }
+    if(typeVolcano){
+        volcano = volcano.filter(x => x.typeVolcano == typeVolcano);
+    }
+
+    return volcano;
+};
+
 const getById = async (volcanoId) => Volcano.findById(volcanoId).lean();
 
 const create = async (data) => Volcano.create(data);
@@ -36,5 +49,6 @@ module.exports = {
     create,
     vote,
     update,
-    deleteById
+    deleteById,
+    searchVolcano
 };
