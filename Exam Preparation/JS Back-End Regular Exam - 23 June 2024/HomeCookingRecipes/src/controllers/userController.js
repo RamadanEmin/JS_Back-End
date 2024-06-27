@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { register } = require('../services/userService');
+const { login, register } = require('../services/userService');
 const { isGuest } = require('../middlewares/guards');
 const { body, validationResult } = require('express-validator')
 const { createToken } = require('../services/jwt');
@@ -36,6 +36,34 @@ userController.post('/register', isGuest(),
         } catch (err) {
             console.log(err);
             res.render('register', { data: { email, username }, errors: parseError(err).errors });
+        }
+    }
+)
+
+userController.get('/logout', (req, res) => {
+    res.clearCookie('token');
+    res.redirect('/');
+});
+
+userController.get('/login', isGuest(), async (req, res) => {
+    res.render('login', { title: 'Login Page' });
+});
+
+userController.post('/login', isGuest(),
+    body('email').trim(),
+    body('password').trim(),
+    async (req, res) => {
+        const { email, password } = req.body;
+
+        try {
+            const result = await login(email, password);
+            const token = createToken(result);
+
+            res.cookie('token', token);
+
+            res.redirect('/');
+        } catch (err) {
+            res.render('login', { data: { email }, errors: parseError(err).errors });
         }
     }
 )
