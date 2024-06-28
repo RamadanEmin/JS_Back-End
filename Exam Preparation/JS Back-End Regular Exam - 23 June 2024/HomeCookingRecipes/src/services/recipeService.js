@@ -4,8 +4,14 @@ async function getRecent() {
   return Recipe.find().sort({ _id: -1 }).limit(3).lean();
 }
 
-async function getAll() {
-  return Recipe.find().lean()
+async function getAll(search) {
+  const query = {};
+
+  if (search) {
+    query.title = new RegExp(search, 'i');
+  }
+
+  return Recipe.find(query).lean()
 }
 
 async function getById(recipeId) {

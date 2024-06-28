@@ -28,6 +28,12 @@ homeController.get('/catalog/:id', async (req, res) => {
     res.render('details', { title: 'Details Page', recipe, isOwner, hasRecommended, numberRecommends });
 })
 
+homeController.get('/search', async (req, res) => {
+    const recipes = await getAll(req.query.search);
+
+    res.render('search', { title: 'Search Page', recipes });
+});
+
 module.exports = {
     homeController
 };
