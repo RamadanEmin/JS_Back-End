@@ -8,6 +8,10 @@ async function getAll() {
   return Recipe.find().lean()
 }
 
+async function getById(recipeId) {
+  return Recipe.findById(recipeId).lean();
+}
+
 async function create(data, ownerId) {
   const record = new Recipe({
     title: data.title,
@@ -26,5 +30,6 @@ async function create(data, ownerId) {
 module.exports = {
   getRecent,
   getAll,
+  getById,
   create
 }
