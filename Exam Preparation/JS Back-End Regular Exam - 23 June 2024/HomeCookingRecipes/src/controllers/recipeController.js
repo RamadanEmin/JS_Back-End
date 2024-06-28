@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { create, getById, update, deleteById } = require('../services/recipeService');
+const { create, getById, update, deleteById, recommend } = require('../services/recipeService');
 const { body, validationResult } = require('express-validator');
 const { isUser } = require('../middlewares/guards');
 const { parseError } = require('../util');
@@ -84,6 +84,19 @@ recipeController.get('/delete/:id', isUser(), async (req, res) => {
         res.redirect('/catalog');
     } catch (err) {
         res.redirect('/catalog/' + recipeId);
+    }
+});
+
+recipeController.get('/recommend/:id', isUser(), async (req, res) => {
+    const recipeId = req.params.id;
+    const userId = req.user._id;
+
+    try {
+        await recommend(recipeId, userId);
+        res.redirect('/catalog/' + recipeId);
+    } catch (err) {
+        console.log(err);
+        res.redirect('/');
     }
 });
 

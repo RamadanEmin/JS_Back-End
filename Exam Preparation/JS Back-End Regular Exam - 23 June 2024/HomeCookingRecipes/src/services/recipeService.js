@@ -63,11 +63,32 @@ async function deleteById(recipeId, userId) {
   await Recipe.findByIdAndDelete(recipeId);
 }
 
+async function recommend(recipeId, userId) {
+  const record = await Recipe.findById(recipeId);
+
+  if (!record) {
+    throw new ReferenceError('Record not found!' + recipeId);
+  }
+
+  if (record.owner.toString() == userId) {
+    throw new Error('Access Denied!');
+  }
+
+  if (record.recommendList.find(l => l.toString() == userId)) {
+    return;
+  }
+
+  record.recommendList.push(userId);
+
+  await record.save();
+}
+
 module.exports = {
   getRecent,
   getAll,
   getById,
   update,
   deleteById,
-  create
+  create,
+  recommend
 }
