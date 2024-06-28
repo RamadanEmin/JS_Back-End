@@ -27,9 +27,32 @@ async function create(data, ownerId) {
   return record;
 }
 
+async function update(recipeId, data, userId) {
+  const record = await Recipe.findById(recipeId);
+
+  if (!record) {
+    throw new ReferenceError('Record not found!' + recipeId);
+  }
+
+  if (record.owner.toString() != userId) {
+    throw new Error('Access Denied!');
+  }
+
+  record.title = data.title;
+  record.ingredients = data.ingredients;
+  record.instructions = data.instructions;
+  record.description = data.description;
+  record.image = data.image;
+
+  await record.save();
+
+  return record;
+}
+
 module.exports = {
   getRecent,
   getAll,
   getById,
+  update,
   create
 }
