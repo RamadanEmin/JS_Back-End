@@ -8,7 +8,23 @@ async function getAll() {
   return Recipe.find().lean()
 }
 
+async function create(data, ownerId) {
+  const record = new Recipe({
+    title: data.title,
+    ingredients: data.ingredients,
+    instructions: data.instructions,
+    description: data.description,
+    image: data.image,
+    owner: ownerId
+  });
+
+  await record.save();
+
+  return record;
+}
+
 module.exports = {
   getRecent,
-  getAll
+  getAll,
+  create
 }
